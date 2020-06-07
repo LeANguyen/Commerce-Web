@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('./partials/bootstrap') %>
+    <%- include('./partials/header') %>
+</head>
+
+<body class="body-style" onload="welcome(); retrieveMe()">
+    <!-- SIGN IN FORM -->
+    <div class="container sign-style">
+        <div class="row py-5 p-4 bg-white rounded shadow-sm">
+            <div class="col-lg-6">
+                <%- include('./partials/signin') %>
+            </div>
+
+            <div class="col-lg-6">
+                <%- include('./partials/signup') %>
+            </div>
+        </div>
+
+    </div>
+    <%- include('./partials/footer') %>
+</body>
+
+<!-- SIGNIN SCRIPT -->
+
+
+</html>

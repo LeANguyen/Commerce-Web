@@ -1,0 +1,190 @@
+<form>
+  <div class="bg-dark rounded-pill px-4 py-3 text-uppercase font-weight-bold" style="color: white">Create an Account
+  </div></br>
+  <p>Don't have an account yet?</p>
+  <div class="form-group">
+    <strong class="text-muted">Username: </strong>
+    <input type="text" class="form-control" id="name_input_signup" aria-describedby="emailHelp" placeholder="Username">
+  </div>
+
+  <div class="form-group">
+    <strong class="text-muted">Email: </strong>
+    <input type="email" class="form-control" aria-describedby="emailHelp" id="email_input_signup" placeholder="Email">
+  </div>
+
+  <div class="form-group">
+    <strong class="text-muted">Password: </strong>
+    <input type="password" class="form-control" id="pass1_input_signup" placeholder="Password"
+      oninput="checkValidOnInput()">
+    <small id="pass1_alert_signup"></small>
+  </div>
+
+  <div class="form-group">
+    <strong class="text-muted">Password Confirmation: </strong>
+    <input type="password" class="form-control" id="pass2_input_signup" placeholder="Confirm Password">
+  </div>
+
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="accept_checkbox_signup">
+    <strong class="text-muted">I accept the Terms of Use & Privacy Policy</strong>
+  </div>
+  <button type="button" id="signup_btn" class="btn btn-info rounded-pill py-2 btn-block" onclick="checkValidOnSubmit()"
+    style="color: white">Sign
+    Up</button>
+</form>
+
+<!-- SIGNUP SCRIPT -->
+<script>
+  function checkValidOnInput() {
+    let password1 = document.getElementById("pass1_input_signup").value;
+    if (password1.length >= 3) {
+      document.getElementById("pass1_alert_signup").textContent = 'Valid password';
+    } else {
+      document.getElementById("pass1_alert_signup").textContent = 'Password must be at least 3 characters.';
+    }
+  }
+</script>
+
+<script>
+  function checkValidOnSubmit() {
+    let name = document.getElementById("name_input_signup").value;
+    let email = document.getElementById("email_input_signup");
+    let password1 = document.getElementById("pass1_input_signup").value;
+    let password2 = document.getElementById("pass2_input_signup").value;
+    let accept = document.getElementById("accept_checkbox_signup").checked;
+
+    if (name == '') {
+      alert("Please enter a user name");
+      return false;
+    }
+
+    if (email.validity.valid == false) {
+      alert("Please enter a valid email adress");
+      return false;
+    }
+    if (password1.length < 3) {
+      alert("Password must be at least 3 characters.");
+      return false;
+    }
+    if (password1 != password2) {
+      alert("Incorrect password confirmation!");
+      return false;
+    }
+    if (accept == false) {
+      alert("Please accept the Terms of Use & Privacy Policy")
+      return false;
+    }
+    checkValidUnusedEmail()
+    return true;
+  }
+</script>
+
+<script>
+  function checkValidUnusedEmail() {
+    document.getElementById("signup_btn").disabled = true;
+    document.getElementById("signup_btn").textContent = "Please wait...";
+    fetch(myURL + '/client/email/' + document.getElementById("email_input_signup").value, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'GET',
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        if (data.length == 0) {
+          signup()
+        } else {
+          alert("Email is already assigned to an account")
+          document.getElementById("signup_btn").disabled = false;
+          document.getElementById("signup_btn").textContent = "Sign Up";
+        }
+      })
+  }
+</script>
+
+<script>
+  function signup() {
+    let email = document.getElementById("email_input_signup").value
+    let password = document.getElementById("pass1_input_signup").value
+    var obj = {
+      "email": email,
+      "pass": password,
+      "name": document.getElementById("name_input_signup").value,
+    }
+
+    fetch(myURL + '/signup', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'POST',
+      body: JSON.stringify(obj)
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        autoSignin(email, password)
+      })
+  }
+</script>
+
+<script>
+  function autoSignin(email, password) {
+    var obj = {
+      "email": email,
+      "pass": password
+    }
+
+    fetch(myURL + '/signin', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'POST',
+      body: JSON.stringify(obj)
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        console.log("signing_auto")
+        if (data.length == 0) {
+          alert("There is a problem with auto signin but please don't reload the page")
+          fetch(myURL + '/client/email/' + document.getElementById("email_input_signup").value, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'GET',
+          })
+            .then((res1) => { return res.json() })
+            .then((data1) => {
+              createCart(data1[0].id)
+            })
+        } else {
+          localStorage.setItem("current_username", data[0].name)
+          localStorage.setItem("id", data[0].id)
+          createCart(data[0].id)
+        }
+      })
+  }
+</script>
+
+<script>
+  function createCart(id) {
+    fetch(myURL + '/cart/client_id/' + id, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'POST',
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        window.location.href = "home_page"
+      })
+  }
+</script>

@@ -1,0 +1,439 @@
+<!doctype html>
+<html>
+
+<head>
+  <%- include('./partials/bootstrap') %>
+  <%- include('./partials/header') %>
+</head>
+
+<body class="body-style" onload="welcome(); loadItem()">
+  <div class="container" style="padding-top: 5vw">
+    <div class="row py-5 p-4 bg-white rounded shadow-sm admin-style">
+      <div class="col-md-12">
+        <div id="item_header" class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Add Item</div>
+        </br>
+      </div>
+
+      <div class="col-md-4">
+        <strong class="text-muted">Item Image: </strong>
+        <img src="no_image.jpg" id="item_imageview" alt="..." class="img-thumbnail">
+      </div>
+
+      <div class="col-md-8">
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            <strong class="text-muted">Item Name: </strong>
+            <input type="text" class="form-control" id="item_name_input" aria-describedby="emailHelp"
+              placeholder="Item Name" onreset="retrieveMe()">
+          </div>
+
+          <div class="form-group col-md-4">
+            <strong class="text-muted">ID: </strong>
+            <input type="number" id="id_input" class="form-control" disabled="true">
+          </div>
+
+          <div class="form-group col-md-4">
+            <strong class="text-muted">Category: </strong>
+            <select class="form-control" id="category_input">
+              <option value="Shirt" selected="true">Shirt</option>
+              <option value="Pant">Pant</option>
+              <option value="Shoe">Shoe</option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-4">
+            <strong class="text-muted">Made in: </strong>
+            <select class="form-control" id="origin_input">
+              <option value="Vietnam" selected="true">Vietnam</option>
+              <option value="China">China</option>
+              <option value="USA">USA</option>
+            </select>
+          </div>
+
+          <div class="form-group col-md-4">
+            <strong class="text-muted">Price($): </strong>
+            <input type="number" id="price_input" class="form-control" step="1" max="9999" min="1" value="10">
+          </div>
+
+          <div class="form-group col-md-8">
+            <strong class="text-muted">Description: </strong>
+            <textarea name="" cols="30" rows="10" class="form-control"
+              id="des_textarea">Size: W:40cm x H:60cm</textarea>
+          </div>
+
+
+          <div class="form-group col-md-4">
+            <strong class="text-muted">Actions: </strong>
+
+            <!-- Image file selector -->
+            <label class="btn btn-info rounded-pill py-2 btn-block font-weight-bold">
+              Change Image<input type="file" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+                id="item_imagepicker" onchange="pickImage(event)" hidden>
+            </label>
+
+            <button type="button" class="btn btn-success rounded-pill py-2 btn-block font-weight-bold" id="add_item_btn"
+              style="color: white" onclick="checkValidOnAddItem()" hidden="true">Add Item</button>
+
+            <button type="button" class="btn btn-success rounded-pill py-2 btn-block font-weight-bold"
+              id="update_item_btn" style="color: white" onclick="checkValidOnUpdateItem()" hidden="true">Update
+              Item</button>
+
+            <label type="button" class="btn btn-danger rounded-pill py-2 btn-block font-weight-bold" id="cancel_btn"
+              style="color: white" onclick="cancel()" hidden="true">Cancel</label>
+
+            <label type="button" class="btn btn-danger rounded-pill py-2 btn-block font-weight-bold" id="cancel_btn"
+              style="color: white" onclick="uploadImageUsingS3()">S3 Upload</label>
+          </div>
+        </div>
+      </div>
+    </div></br></br>
+
+    <div class="row">
+      <div class="col-lg-12 p-5 bg-white rounded shadow-sm mb-5">
+
+        <!-- Item list table -->
+        <div class="table-responsive">
+          <table class="table" id="item_table">
+            <thead>
+              <tr>
+                <th scope="col" class="border-0 bg-light">
+                  <div class="p-2 px-3 text-uppercase">ID</div>
+                </th>
+                <th scope="col" class="border-0 bg-light">
+                  <div class="p-2 px-3 text-uppercase">Product</div>
+                </th>
+                <th scope="col" class="border-0 bg-light">
+                  <div class="py-2 text-uppercase">Price</div>
+                </th>
+                <th scope="col" class="border-0 bg-light">
+                  <div class="py-2 text-uppercase"></div>
+                </th>
+                <th scope="col" class="border-0 bg-light">
+                  <div class="py-2 text-uppercase"></div>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="item_table_body">
+              <!-- Item List Here -->
+            </tbody>
+          </table>
+        </div>
+        <!-- End -->
+      </div>
+    </div>
+  </div>
+  <%- include('./partials/footer') %>
+</body>
+
+<!-- Add Item Script -->
+<script>
+  function checkValidOnAddItem() {
+    if (document.getElementById("item_name_input").value == '') {
+      alert("Please enter the item name");
+      return false;
+    }
+
+    if (document.getElementById("price_input").value == '') {
+      alert("Please enter the item price");
+      return false;
+    }
+    addItem()
+  }
+</script>
+<script>
+  function addItem() {
+    document.getElementById("add_item_btn").disabled = true
+    document.getElementById("add_item_btn").textContent = "Please wait..."
+    var obj = {
+      "item_name": document.getElementById("item_name_input").value,
+      "category": document.getElementById("category_input").value,
+      "origin": document.getElementById("origin_input").value,
+      "price": document.getElementById("price_input").value,
+      "description": document.getElementById("des_textarea").value,
+    }
+
+    fetch(myURL + '/item', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'POST',
+      body: JSON.stringify(obj)
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        uploadImage()
+      })
+  }
+</script>
+
+<!-- Update Item Script -->
+<script>
+  function checkValidOnUpdateItem() {
+    if (document.getElementById("item_name_input").value == '') {
+      alert("Please enter the item name");
+      return false;
+    }
+    if (document.getElementById("price_input").value == '') {
+      alert("Please enter the item price");
+      return false;
+    }
+    updateItem()
+  }
+</script>
+
+<script>
+  function updateItem() {
+    document.getElementById("update_item_btn").disabled = true
+    document.getElementById("update_item_btn").textContent = "Please wait..."
+    var obj = {
+      "item_name": document.getElementById("item_name_input").value,
+      "category": document.getElementById("category_input").value,
+      "origin": document.getElementById("origin_input").value,
+      "price": document.getElementById("price_input").value,
+      "description": document.getElementById("des_textarea").value,
+    }
+
+    fetch(myURL + '/item/id/' + document.getElementById("id_input").value, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'PUT',
+      body: JSON.stringify(obj)
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        uploadImage()
+      })
+  }
+</script>
+<script>
+  function updateBtnOnTableRowClicked(item_id) {
+    window.location.href = "/admin_page?id=" + item_id
+  }
+</script>
+
+<!-- Load Item Script -->
+<script>
+  function loadItem() {
+    if (localStorage.getItem('current_username') != 'admin') {
+      window.location.href = "home_page"
+    }
+
+    if (get('id') != null) {
+      document.getElementById("item_header").textContent = "Update Item"
+      fetch(myURL + '/item/id/' + get('id'), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Basic ' + btoa(name + ":" + pass)
+        },
+        method: 'GET',
+      })
+        .then((res) => { return res.json() })
+        .then((data) => {
+          document.getElementById("item_name_input").value = data[0].item_name
+          document.getElementById("price_input").value = data[0].price
+          document.getElementById("category_input").value = data[0].category
+          document.getElementById("origin_input").value = data[0].origin
+          document.getElementById("des_textarea").textContent = data[0].description
+          document.getElementById("item_imageview").src = 'uploaded_images/item' + data[0].id + '.png'
+          document.getElementById("update_item_btn").hidden = false
+          document.getElementById("cancel_btn").hidden = false
+          document.getElementById("id_input").hidden = false
+          document.getElementById("id_input").value = data[0].id
+        })
+    } else {
+      document.getElementById("add_item_btn").hidden = false
+    }
+
+    fetch(myURL + '/items', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'GET',
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        for (i = 0; i < data.length; i++) {
+          tr = document.createElement('tr');
+          tr.id = data[i].id;
+          document.getElementById("item_table_body").appendChild(tr)
+          document.getElementById(tr.id).innerHTML =
+            `<tr>
+              <td class="align-middle"><strong id="id_label${data[i].id}">${data[i].id}</strong></td>
+              <th scope="row">
+                <div class="p-2">
+                  <img src="../uploaded_images/item${data[i].id}.png"
+                    alt="No Image" width="70" class="img-fluid rounded shadow-sm">
+                  <div class="ml-3 d-inline-block align-middle">
+                    <h5 class="mb-0"> <a href="/item_detail_page?id=${data[i].id}"
+                    class="text-dark d-inline-block align-middle">${data[i].item_name}</a></h5><span
+                    class="text-muted font-weight-normal font-italic d-block">Category: ${data[i].category}</span><span
+                    class="text-muted font-weight-normal font-italic d-block">Made in ${data[i].origin}</span>
+                  </div>
+                </div>
+              </th>
+              <td class="align-middle"><strong id="price_label${data[i].id}">$${data[i].price}</strong></td>
+              <td class="align-middle"><a class="btn btn-success" onclick="updateBtnOnTableRowClicked(${data[i].id})" style="color: white">Update</a></td>
+              <td class="align-middle"><button class="btn btn-danger" id="remove_btn${data[i].id}" onclick="removeItem(${data[i].id})" style="color: white">Remove</button></td>
+            </tr>`;
+        }
+        $(document).ready(function () {
+          $('#item_table').DataTable();
+        });
+      })
+  }
+</script>
+
+<!-- Remove Item Script -->
+<script>
+  function removeItem(item_id) {
+    document.getElementById("remove_btn" + item_id).disabled = true
+    document.getElementById("remove_btn" + item_id).textContent = "Please wait..."
+    fetch(myURL + '/item/id/' + item_id, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'DELETE',
+    })
+      .then((res1) => { return res1.json() })
+      .then((data1) => {
+        fetch(myURL + '/image?id=' + item_id, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Basic ' + btoa(name + ":" + pass)
+          },
+          method: 'DELETE',
+        })
+          .then((res2) => { return res2.json() })
+          .then((data2) => {
+            document.getElementById(item_id).hidden = true
+          })
+      })
+  }
+</script>
+
+<!-- Image Script -->
+<script>
+  var pickImage = function (event) {
+    image = document.getElementById('item_imageview');
+    file = event.target.files[0]
+    if (file.size > (100 * 1024)) {
+      alert('Sorry, the max allowed size for images is 100KB')
+    } else {
+      image.src = URL.createObjectURL(file);
+    }
+    // image.src = URL.createObjectURL(event.target.files[0]);
+  };
+
+  function uploadImage() {
+    image = document.getElementById('item_imageview');
+    category = document.getElementById('category_input').value
+
+    const formData = new FormData()
+
+    fetch(myURL + '/current_item', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'GET',
+    })
+      .then((item_res) => { return item_res.json() })
+      .then((item_data) => {
+
+        // create an image file from image.src
+        fetch(image.src)
+          .then(res => res.blob())
+          .then(blob => {
+            var id = 0
+            if (document.getElementById('id_input').value == '') {
+              id = item_data[0].max
+            } else {
+              id = document.getElementById('id_input').value
+            }
+            const file = new File([blob], 'item' + id + '.png', blob)
+            formData.append('image_file', file)
+
+            // upload the file
+            fetch(myURL + '/image', {
+              headers: {
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+              },
+              method: 'PUT',
+              body: formData
+            })
+              .then((upload_res) => { return upload_res.json() })
+              .then((upload_data) => {
+                window.location.href = "admin_page"
+              })
+          })
+      })
+  }
+</script>
+
+<script>
+  function cancel() {
+    window.location.href = "admin_page"
+  }
+</script>
+
+<script>
+  function uploadImageUsingS3() {
+    image = document.getElementById('item_imageview');
+    category = document.getElementById('category_input').value
+
+    const formData = new FormData()
+
+    fetch(myURL + '/current_item', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'GET',
+    })
+      .then((item_res) => { return item_res.json() })
+      .then((item_data) => {
+
+        // create an image file from image.src
+        fetch(image.src)
+          .then(res => res.blob())
+          .then(blob => {
+            var id = 0
+            if (document.getElementById('id_input').value == '') {
+              id = item_data[0].max
+            } else {
+              id = document.getElementById('id_input').value
+            }
+            const file = new File([blob], 'item' + id + '.png', blob)
+            formData.append('image_file', file)
+
+            // upload the file
+            fetch(myURL + '/image', {
+              headers: {
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+              },
+              method: 'POST',
+              body: formData
+            })
+              .then((upload_res) => { return upload_res.json() })
+              .then((upload_data) => {
+                window.location.href = "admin_page"
+              })
+          })
+      })
+  }
+</script>
+
+</html>

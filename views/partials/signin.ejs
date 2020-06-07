@@ -1,0 +1,95 @@
+<form>
+  <div class="bg-dark rounded-pill px-4 py-3 text-uppercase font-weight-bold" style="color: white">Signin to an Account</div></br>
+  <p>Please Sign In to save a cart</p>
+  <div class="form-group">
+    <strong class="text-muted">Email: </strong>
+    <input type="text" class="form-control" id="email_input_signin" aria-describedby="emailHelp" placeholder="Email"
+      onreset="retrieveMe()">
+  </div>
+
+  <div class="form-group">
+    <strong class="text-muted">Password: </strong>
+    <input type="password" class="form-control" id="pass_input_signin" placeholder="Password">
+  </div>
+
+  <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="remember_checkbox_signin">
+    <strong class="text-muted">Remember me</strong>
+  </div>
+
+  <button class="btn btn-info rounded-pill py-2 btn-block" id="signin_btn" type="button" onclick="rememberMe()" style="color: white">Sign
+    In</button><br>
+</form>
+
+<script>
+  function rememberMe() {
+    let username = document.getElementById("email_input_signin").value;
+    let password = document.getElementById("pass_input_signin").value;
+    let checked = document.getElementById("remember_checkbox_signin").checked;
+
+    if (username == '' || password == '') {
+      alert("Please enter an existed username & password");
+      return false;
+    }
+
+    if (document.getElementById("remember_checkbox_signin").checked == true) {
+      localStorage.setItem("username", username);
+      localStorage.setItem("password", password);
+      localStorage.setItem("checked", checked);
+    } else {
+      localStorage.removeItem("username");
+      localStorage.removeItem("password");
+      localStorage.removeItem("checked");
+    }
+    signin()
+  }
+</script>
+
+<script>
+  function retrieveMe() {
+    alert("*Developer Hint: Login with (email: admin, password: 123) to accesss the admin's page")
+    document.getElementById("email_input_signin").value = localStorage.getItem("username");
+    document.getElementById("pass_input_signin").value = localStorage.getItem("password");
+    document.getElementById("remember_checkbox_signin").checked = localStorage.getItem("checked");
+  }
+</script>
+
+<script>
+  function signin() {
+    document.getElementById("signin_btn").disabled = true;
+    document.getElementById("signin_btn").textContent = "Please wait...";
+
+    var obj = {
+      "email": document.getElementById("email_input_signin").value,
+      "pass": document.getElementById("pass_input_signin").value
+    }
+
+    fetch(myURL + '/signin', {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+      },
+      method: 'POST',
+      body: JSON.stringify(obj)
+    })
+      .then((res) => { return res.json() })
+      .then((data) => {
+        if (data.length == 0) {
+          alert("Invalid name or password")
+          document.getElementById("signin_btn").disabled = false;
+          document.getElementById("signin_btn").textContent = "Sign In";
+        } else {
+          localStorage.setItem("current_username", data[0].name)
+          localStorage.setItem("id", data[0].id)
+
+          if (data[0].name == "admin") {
+            window.location.href = "admin_page";
+          } else {
+            window.location.href = "home_page";
+          }
+
+        }
+      })
+  }
+</script>

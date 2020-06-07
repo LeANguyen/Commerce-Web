@@ -1,0 +1,161 @@
+<head>
+    <%- include('./partials/bootstrap') %>
+    <%- include('./partials/header') %>
+</head>
+
+<body onload="welcome(); loadCart()">
+    <div class="px-4 px-lg-0">
+        <!-- For demo purpose -->
+        <div class="container text-white py-5 text-center">
+        </div>
+        <!-- End -->
+
+        <div class="pb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 p-5 bg-white rounded shadow-sm mb-5">
+
+                        <!-- Shopping cart table -->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="p-2 px-3 text-uppercase">Product</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Price</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Quantity</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Total</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart_table_body">
+                                    <!-- Cart Item List -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- End -->
+                    </div>
+                </div>
+
+                <div class="row py-5 p-4 bg-white rounded shadow-sm">
+                    <div class="col-lg-6">
+                        <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Shipping
+                            Information</div>
+                        <div class="p-4">
+                            <div class="container">
+                                <form>
+                                    <div class="form-group">
+                                        <strong class="text-muted">Receiver's Name: </strong>
+                                        <input type="text" class="form-control" id="client_name_input"
+                                            placeholder="Receiver's name" disabled="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <strong class="text-muted">Address: </strong>
+                                        <input type="text" class="form-control" aria-describedby="emailHelp"
+                                            id="address_input" placeholder="Address" disabled="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <strong class="text-muted">Phone Number: </strong>
+                                        <input type="text" class="form-control" id="phone_input"
+                                            placeholder="Phone Number" disabled="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <strong class="text-muted">Checkout Date: </strong>
+                                        <input type="text" class="form-control" id="checkout_date_input"
+                                            placeholder="Phone Number" disabled="true">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Order summary
+                        </div>
+                        <div class="p-4">
+                            <ul class="list-unstyled mb-4">
+                                <li class="d-flex justify-content-between py-3 border-bottom"><strong
+                                        class="text-muted">Total</strong>
+                                    <h5 id="big_total_label" class="font-weight-bold">$0</h5>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer') %>
+</body>
+
+<script>
+    function loadCart() {
+        if (localStorage.getItem("id") == null) {
+            window.location.href = "signin_page"
+        }
+
+        fetch(myURL + '/cart_items/cart_id/' + get('id'), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'GET',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                console.log(localStorage.getItem("id"))
+                console.log(data)
+
+                if (data.length == 0) {
+                    document.getElementById("checkout_btn").disabled = true
+                }
+
+                for (i = 0; i < data.length; i++) {
+                    tr = document.createElement('tr');
+                    tr.id = data[i].item_id;
+                    document.getElementById("cart_table_body").appendChild(tr)
+                    document.getElementById(tr.id).innerHTML =
+                        `<tr>
+                                <th scope="row">
+                                    <div class="p-2">
+                                        <img src="uploaded_images/item${data[i].item_id}.png"
+                                            alt="No Image" width="70" class="img-fluid rounded shadow-sm">
+                                        <div class="ml-3 d-inline-block align-middle">
+                                            <h5 class="mb-0"> <a href="item_detail_page?id=${data[i].item_id}"
+                                            class="text-dark d-inline-block align-middle">${data[i].item_name}</a></h5>
+                                            <span class="text-muted font-weight-normal font-italic d-block">Category: ${data[i].category}</span>
+                                            <span class="text-muted font-weight-normal font-italic d-block">Made in ${data[i].origin}</span>
+                                        </div>
+                                    </div>
+                                </th>
+                                <td class="align-middle"><strong id="price_label${data[i].item_id}">$${data[i].price}</strong></td>
+                                <td class="align-middle"><strong class="text-muted" id="quantity_label${data[i].item_id}">x ${data[i].quantity}</strong></td>
+                                <td class="align-middle"><strong id="sub_total_label${data[i].item_id}">$${data[i].price * data[i].quantity}</strong></td>
+                            </tr>`;
+
+                    price = parseInt(document.getElementById("price_label" + data[i].item_id).textContent.slice(1))
+                    quantity = parseInt(document.getElementById("quantity_label" + data[i].item_id).textContent.slice(2))
+                    sub_total = price * quantity
+                    big_total = parseInt(document.getElementById("big_total_label").textContent.slice(1))
+                    document.getElementById("big_total_label").textContent = '$' + (big_total + sub_total)
+                }
+                document.getElementById("client_name_input").value = data[0].client_name
+                document.getElementById("address_input").value = data[0].address
+                document.getElementById("phone_input").value = data[0].phone
+                document.getElementById("checkout_date_input").value = data[0].checkout_date
+            })
+    }
+</script>

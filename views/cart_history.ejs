@@ -1,0 +1,105 @@
+<head>
+    <%- include('./partials/bootstrap') %>
+    <%- include('./partials/header') %>
+</head>
+
+<body onload="welcome(); loadHistory()">
+    <div class="px-4 px-lg-0">
+        <div class="container text-white py-5 text-center">
+        </div>
+        <div class="pb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 p-5 bg-white rounded shadow-sm mb-5">
+
+                        <!-- Shopping cart table -->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="p-2 px-3 text-uppercase">Checkout Date</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Receiver's Name</div>
+                                        </th>
+
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Address</div>
+                                        </th>
+
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Phone</div>
+                                        </th>
+
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart_table_body">
+                                    <!-- List goes here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- End -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer') %>
+</body>
+
+<script>
+    function loadHistory() {
+        if (localStorage.getItem("id") == null) {
+            window.location.href = "sign_page"
+        }
+
+        var client_id = 0
+        if (localStorage.getItem("id") != null) {
+            client_id = localStorage.getItem("id")
+        }
+
+        fetch(myURL + '/carts/client_id/' + client_id, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'GET',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                console.log(localStorage.getItem("id"))
+                console.log(data)
+
+                if (data.length == 0) {
+                    document.getElementById("checkout").disabled = true
+                }
+
+                for (i = 0; i < data.length - 1; i++) {
+                    tr = document.createElement('tr');
+                    tr.id = data[i].id;
+                    document.getElementById("cart_table_body").appendChild(tr)
+                    document.getElementById(tr.id).innerHTML =
+                        `<tr>
+                            <td class="align-middle"><strong id="client_name_label${data[i].id}">${data[i].checkout_date}</strong></td>
+                            <td class="align-middle"><strong class="text-muted" id="client_name_label${data[i].id}">${data[i].client_name}</strong></td>
+                            <td class="align-middle"><strong class="text-muted" id="address_label${data[i].id}">${data[i].address}</strong></td>
+                            <td class="align-middle"><strong class="text-muted" id="phone_label${data[i].id}">${data[i].phone}</strong></td>
+                            <td class="align-middle"><a class="btn btn-info" onclick="toCartDetail(${data[i].id})" style="color: white">Detail</a></td>
+                        </tr>`;
+                }
+
+            })
+    }
+</script>
+
+<script>
+    function toCartDetail(cart_id) {
+        window.location.href = "cart_detail_page?id=" + cart_id
+    }
+</script>

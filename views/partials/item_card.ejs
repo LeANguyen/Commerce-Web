@@ -1,0 +1,143 @@
+<script>
+    function addToCart(item_id) {
+        document.getElementById("add_to_cart_btn" + item_id).disabled = true
+        document.getElementById("add_to_cart_btn" + item_id).textContent = "Please wait..."
+
+        var obj = {
+            "quantity": document.getElementById("quantity_input" + item_id).value,
+        }
+
+        fetch(myURL + '/cart_item/current_cart/client_id/' + localStorage.getItem("id") + '/item_id/' + parseInt(item_id), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'POST',
+            body: JSON.stringify(obj)
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                document.getElementById("add_to_cart_btn" + item_id).disabled = false
+                document.getElementById("add_to_cart_btn" + item_id).textContent = "Remove from Cart"
+                document.getElementById("add_to_cart_btn" + item_id).className = "btn btn-danger rounded-pill py-2 btn-block"
+                document.getElementById("add_to_cart_btn" + item_id).onclick = function () { removeFromCart(item_id) }
+            })
+    }
+</script>
+
+<script>
+    function removeFromCart(item_id) {
+        document.getElementById("add_to_cart_btn" + item_id).disabled = true
+        document.getElementById("add_to_cart_btn" + item_id).textContent = "Please wait..."
+
+        fetch(myURL + '/cart_item/current_cart/client_id/' + localStorage.getItem("id") + '/item_id/' + parseInt(item_id), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'DELETE',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                document.getElementById("add_to_cart_btn" + item_id).disabled = false
+                document.getElementById("add_to_cart_btn" + item_id).textContent = "Add to Cart"
+                document.getElementById("add_to_cart_btn" + item_id).className = "btn btn-success rounded-pill py-2 btn-block"
+                document.getElementById("add_to_cart_btn" + item_id).onclick = function () { addToCart(item_id) }
+            })
+    }
+</script>
+
+<script>
+    function quantityEdit(item_id) {
+        var obj = {
+            "quantity": document.getElementById("quantity_input" + item_id).value,
+        }
+
+        var client_id = 0
+        if (localStorage.getItem("id") != null) {
+            client_id = localStorage.getItem("id")
+        }
+        fetch(myURL + '/cart_item/current_cart/client_id/' + client_id + '/item_id/' + parseInt(item_id), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'PUT',
+            body: JSON.stringify(obj)
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                // document.getElementById("quantity_input" + item_id).disabled = false
+            })
+    }
+</script>
+
+<script>
+    function checkSignedIn() {
+        if (get('category') != null) {
+            fetch(myURL + '/items/category/' + get('category'), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + btoa(name + ":" + pass)
+                },
+                method: 'GET'
+            })
+                .then((res) => { return res.json() })
+                .then((data) => {
+                    if (localStorage.getItem("id") == null) {
+                        for (i = 0; i < data.length; i++) {
+                            document.getElementById("add_to_cart_btn" + data[i].id).onclick = function () { window.location.href = "sign_page" }
+                        }
+                    }
+                })
+        } else if (get('name') != null) {
+            fetch(myURL + '/items/name/' + get('name'), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + btoa(name + ":" + pass)
+                },
+                method: 'GET'
+            })
+                .then((res) => { return res.json() })
+                .then((data) => {
+                    if (localStorage.getItem("id") == null) {
+                        for (i = 0; i < data.length; i++) {
+                            document.getElementById("add_to_cart_btn" + data[i].id).onclick = function () { window.location.href = "sign_page" }
+                        }
+                    }
+                })
+        } else {
+            fetch(myURL + '/items', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': 'Basic ' + btoa(name + ":" + pass)
+                },
+                method: 'GET'
+            })
+                .then((res) => { return res.json() })
+                .then((data) => {
+                    var len = 6
+                    if (data.length < 6) {
+                        len = data.length
+                    }
+                    if (localStorage.getItem("id") == null) {
+                        for (i = 0; i < len; i++) {
+                            document.getElementById("add_to_cart_btn" + data[i].id).onclick = function () { window.location.href = "sign_page" }
+                        }
+                    }
+                })
+        }
+    }
+</script>
+
+<script>
+    function toItemDetail(item_id) {
+        window.location.href = "/item_detail_page?id=" + item_id
+    }
+</script>

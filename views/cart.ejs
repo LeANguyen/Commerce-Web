@@ -1,0 +1,306 @@
+<head>
+    <%- include('./partials/bootstrap') %>
+    <%- include('./partials/header') %>
+</head>
+
+<body onload="welcome(); loadCart()">
+    <div class="px-4 px-lg-0">
+        <!-- For demo purpose -->
+        <div class="container text-white py-5 text-center">
+        </div>
+        <!-- End -->
+
+        <div class="pb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 p-5 bg-white rounded shadow-sm mb-5">
+
+                        <!-- Shopping cart table -->
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="p-2 px-3 text-uppercase">Product</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Price</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Quantity</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase">Total</div>
+                                        </th>
+                                        <th scope="col" class="border-0 bg-light">
+                                            <div class="py-2 text-uppercase"></div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart_table_body">
+                                    <!-- Cart Item List -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- End -->
+                    </div>
+                </div>
+
+                <div class="row py-5 p-4 bg-white rounded shadow-sm">
+                    <div class="col-lg-6">
+                        <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Shipping
+                            Information</div>
+                        <div class="p-4">
+                            <div class="container">
+                                <form>
+                                    <div class="form-group">
+                                        <strong class="text-muted">Receiver's Name: </strong>
+                                        <input type="text" class="form-control" id="client_name_input"
+                                            placeholder="Receiver's name">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <strong class="text-muted">Address: </strong>
+                                        <input type="text" class="form-control" aria-describedby="emailHelp"
+                                            id="address_input" placeholder="Address">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <strong class="text-muted">Phone Number: </strong>
+                                        <input type="text" class="form-control" id="phone_input"
+                                            placeholder="Phone Number">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="bg-light rounded-pill px-4 py-3 text-uppercase font-weight-bold">Order summary
+                        </div>
+                        <div class="p-4">
+                            <ul class="list-unstyled mb-4">
+                                <li class="d-flex justify-content-between py-3 border-bottom"><strong
+                                        class="text-muted">Total</strong>
+                                    <h5 id="big_total_label" class="font-weight-bold">$0</h5>
+                                </li>
+                            </ul>
+                            <button class="btn btn-info rounded-pill py-2 btn-block" id="checkout_btn"
+                                style="color: white" onclick="checkValidOnCheckOut()">Procceed to
+                                Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer') %>
+</body>
+
+<script>
+    function loadCart() {
+        if (localStorage.getItem("id") == null) {
+            window.location.href = "sign_page"
+        }
+
+        var client_id = 0
+        if (localStorage.getItem("id") != null) {
+            client_id = localStorage.getItem("id")
+        }
+
+        fetch(myURL + '/cart_items/current_cart/client_id/' + client_id, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'GET',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                console.log(localStorage.getItem("id"))
+                console.log(data)
+
+                if (data.length == 0) {
+                    document.getElementById("checkout_btn").disabled = true
+                }
+
+                for (i = 0; i < data.length; i++) {
+                    tr = document.createElement('tr');
+                    tr.id = data[i].item_id;
+                    document.getElementById("cart_table_body").appendChild(tr)
+                    document.getElementById(tr.id).innerHTML =
+                        `<tr>
+                            <th scope="row">
+                                <div class="p-2">
+                                    <img src="uploaded_images/item${data[i].item_id}.png"
+                                        alt="No Image" width="70" class="img-fluid rounded shadow-sm">
+                                    <div class="ml-3 d-inline-block align-middle">
+                                        <h5 class="mb-0"> <a href="item_detail_page?id=${data[i].item_id}"
+                                        class="text-dark d-inline-block align-middle">${data[i].item_name}</a></h5>
+                                        <span class="text-muted font-weight-normal font-italic d-block">Category: ${data[i].category}</span>
+                                        <span class="text-muted font-weight-normal font-italic d-block">Made in ${data[i].origin}</span>
+                                    </div>
+                                </div>
+                            </th>
+                            <td class="align-middle"><strong id="price_label${data[i].item_id}">$${data[i].price}</strong></td>
+                            <td class="align-middle"><input type="number" id="quantity_input${data[i].item_id}" oninput="this.value = Math.abs(this.value)"
+                                class="form-control" step="1" max="9999" min="1" value="${data[i].quantity}" onfocusin="quantity_focus(this.value)" onchange="quantity_edit(${data[i].item_id})"></td>
+                            <td class="align-middle"><strong id="sub_total_label${data[i].item_id}">$${data[i].price * data[i].quantity}</strong></td>
+                            <td class="align-middle"><button class="btn btn-danger" id="remove_btn${data[i].item_id}" onclick="remove(${data[i].item_id})" style="color: white">Remove</button></td>
+                        </tr>`;
+
+                    price = parseInt(document.getElementById("price_label" + data[i].item_id).textContent.slice(1))
+                    sub_total = price * document.getElementById("quantity_input" + data[i].item_id).value
+                    big_total = parseInt(document.getElementById("big_total_label").textContent.slice(1))
+                    document.getElementById("big_total_label").textContent = '$' + (big_total + sub_total)
+                }
+            })
+    }
+</script>
+
+<script>
+    var old_quantity = 0
+
+    function quantity_focus(quantity) {
+        old_quantity = quantity
+    }
+
+    function quantity_edit(item_id) {
+        var obj = {
+            "quantity": document.getElementById("quantity_input" + item_id).value,
+        }
+
+        fetch(myURL + '/cart_item/current_cart/client_id/' + localStorage.getItem("id") + '/item_id/' + item_id, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'PUT',
+            body: JSON.stringify(obj)
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                new_quantity = document.getElementById("quantity_input" + item_id).value
+
+                price = parseInt(document.getElementById("price_label" + item_id).textContent.slice(1))
+                sub_total = price * new_quantity
+                document.getElementById("sub_total_label" + item_id).textContent = '$' + sub_total
+
+                big_total = parseInt(document.getElementById("big_total_label").textContent.slice(1))
+                new_big_total = big_total - (old_quantity * price) + (new_quantity * price)
+                document.getElementById("big_total_label").textContent = '$' + new_big_total
+                old_quantity = new_quantity
+            })
+    }
+</script>
+
+<script>
+    function remove(item_id) {
+        document.getElementById("remove_btn" + item_id).disabled = true
+        document.getElementById("remove_btn" + item_id).textContent = "Please wait..."
+
+        fetch(myURL + '/cart_item/current_cart/client_id/' + localStorage.getItem("id") + '/item_id/' + item_id, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'DELETE',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                fetch(myURL + '/cart_items/current_cart/client_id/' + localStorage.getItem("id"), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': 'Basic ' + btoa(name + ":" + pass)
+                    },
+                    method: 'GET',
+                })
+                    .then((res2) => { return res2.json() })
+                    .then((data2) => {
+                        if (data2.length == 0) {
+                            document.getElementById("checkout_btn").disabled = true
+                        }
+                        document.getElementById(item_id).hidden = true
+                        big_total = parseInt(document.getElementById("big_total_label").textContent.slice(1))
+                        quantity = document.getElementById("quantity_input" + item_id).value
+                        price = parseInt(document.getElementById("price_label" + item_id).textContent.slice(1))
+                        new_big_total = big_total - (quantity * price)
+                        document.getElementById("big_total_label").textContent = '$' + new_big_total
+                    })
+            })
+    }
+</script>
+
+<script>
+    function checkValidOnCheckOut() {
+        console.log('OnSubmit')
+        let client_name = document.getElementById("client_name_input").value;
+        let address = document.getElementById("address_input").value;
+        let phone = document.getElementById("phone_input").value;
+
+        if (client_name == '') {
+            alert("Please enter a receiver's name");
+            return false;
+        }
+
+        if (address == '') {
+            alert("Please enter an address");
+            return false;
+        }
+
+        if (phone == '') {
+            alert("Please enter a phone number");
+            return false;
+        }
+        checkout()
+        return true;
+    }
+</script>
+
+<script>
+    function checkout() {
+        document.getElementById("checkout_btn").disabled = true
+        document.getElementById("checkout_btn").textContent = "Please wait..."
+        var obj = {
+            "client_name": document.getElementById("client_name_input").value,
+            "address": document.getElementById("address_input").value,
+            "phone": document.getElementById("phone_input").value,
+            "checkout_date": getCurrentDateTime()
+        }
+
+        fetch(myURL + '/current_cart/client_id/' + localStorage.getItem("id"), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'PUT',
+            body: JSON.stringify(obj)
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                createCart()
+            })
+    }
+</script>
+
+<script>
+    function createCart() {
+        fetch(myURL + '/cart/client_id/' + localStorage.getItem("id"), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Basic ' + btoa(name + ":" + pass)
+            },
+            method: 'POST',
+        })
+            .then((res) => { return res.json() })
+            .then((data) => {
+                window.location.href = "home_page"
+            })
+    }
+</script>

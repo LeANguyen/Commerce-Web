@@ -1,99 +1,91 @@
 /* footer */
 .footer-style {
-    background-color: #555;
+  background-color: #555;
 }
 
 .footer-style h2 {
-    color: goldenrod;
+  color: goldenrod;
 }
 
 .footer-style p {
-    color: white;
-    /* font-size: 20px; */
+  color: white;
+  /* font-size: 20px; */
 }
 
 .footer-style a {
-    color: white;
-    /* font-size: 20px; */
+  color: white;
+  /* font-size: 20px; */
 }
 
 .footer-style a:hover {
-    color: white;
-    text-underline-position: below;
+  color: white;
+  text-underline-position: below;
 }
 
 .footer-style p {
-    color: white;
+  color: white;
 }
 
 /* header */
 .header-style {
-    background-color: #555;
-    /* border: thick darkgoldenrod solid; */
-    /* height: 100px; */
+  background-color: #555;
+  /* border: thick darkgoldenrod solid; */
+  /* height: 100px; */
 }
 
 .header-style a {
-    /* font-size: 25px; */
-    margin-top: 5px;
-    margin-right: 20px;
-    margin-left: 20px;
+  /* font-size: 25px; */
+  margin-top: 5px;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 
 /* admin-style */
 .admin-style {
-    padding: 5vw; 
-    text-align: center;
+  padding: 5vw;
+  text-align: center;
 }
 
 /* item-detail-style */
 .item-detail-style {
-    padding: 5vw; 
-    text-align: left;
+  padding: 5vw;
+  text-align: left;
 }
 
 /* sign style */
 .sign-style {
-    padding: 5vw; 
-    text-align: center;
+  padding: 5vw;
+  text-align: center;
 }
 
 .sign-style h2 {
-    color: #555;
+  color: #555;
 }
 
 .sign-style label {
-    color: #555;
+  color: #555;
 }
 
 .sign-style p {
-    color: #555;
+  color: #555;
 }
 
 .sign-style a {
-    color: seagreen;
+  color: seagreen;
 }
 
 .sign-style a:hover {
-    color: seagreen;
+  color: seagreen;
 }
 
 .sign-style small {
-    color: seagreen;
+  color: seagreen;
 }
 
-
-
-
-
-
-
-
-
 .card-body-style {
-    text-align: left;
-    /* background-color: #555; */
-    /* border: thick white solid; */
+  text-align: left;
+  /* background-color: #555; */
+  /* border: thick white solid; */
 }
 
 /* .card-body-style h4 {
@@ -104,78 +96,91 @@
     color: white;
 } */
 
-
-
-
-
-
 /* CSS Document */
-a:hover { text-decoration:underline; }
-  
-#wrapper, #loginform {
-    margin:0 auto;
-    padding-bottom:25px;
-    background:rgb(53, 58, 63);
-    width:504px; }
-  
-#loginform { padding-top:18px; }
-  
-    #loginform p { margin: 5px; }
-  
+a:hover {
+  text-decoration: underline;
+}
+
+#wrapper,
+#loginform {
+  margin: 0 auto;
+  padding-bottom: 25px;
+  background: rgb(53, 58, 63);
+  width: 504px;
+}
+
+#loginform {
+  padding-top: 18px;
+}
+
+#loginform p {
+  margin: 5px;
+}
+
 #chatbox {
-    text-align:left;
-    margin:0 auto;
-    margin-bottom:25px;
-    padding:10px;
-    background:#fff;
-    height:270px;
-    width:430px;
-    overflow:auto; }
-  
+  text-align: left;
+  margin: 0 auto;
+  margin-bottom: 25px;
+  padding: 10px;
+  background: #fff;
+  height: 270px;
+  width: 430px;
+  overflow: auto;
+}
+
 #usermsg {
-    width:395px;}
-  
-#submit { width: 60px; }
-  
-#menu { padding:12.5px 25px 12.5px 25px; }
-  
-.welcome { float:left; }
-  
-.logout { float:right; }
-  
-.msgln { margin:0 0 2px 0; }
+  width: 395px;
+}
 
+#submit {
+  width: 60px;
+}
 
+#menu {
+  padding: 12.5px 25px 12.5px 25px;
+}
 
+.welcome {
+  float: left;
+}
 
+.logout {
+  float: right;
+}
+
+.msgln {
+  margin: 0 0 2px 0;
+}
 
 body {
-    background: #eecda3;
-    background: -webkit-linear-gradient(to right, skyblue, palevioletred);
-    background: linear-gradient(to right, goldenrod, palevioletred);
-    min-height: 100vh;
-    align-content: center;
-  }
-
-.btn span.glyphicon {    			
-	opacity: 0;				
-}
-.btn.active span.glyphicon {				
-	opacity: 1;				
+  background: #eecda3;
+  background: -webkit-linear-gradient(to right, skyblue, palevioletred);
+  background: linear-gradient(to right, goldenrod, palevioletred);
+  min-height: 100vh;
+  align-content: center;
 }
 
-
+.btn span.glyphicon {
+  opacity: 0;
+}
+.btn.active span.glyphicon {
+  opacity: 1;
+}
 
 .loader {
-    border: 6px solid #f3f3f3; /* Light grey */
-    border-top: 6px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    animation: spin 2s linear infinite;
+  border: 6px solid #f3f3f3; /* Light grey */
+  border-top: 6px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
   }
+}

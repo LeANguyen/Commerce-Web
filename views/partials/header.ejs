@@ -1,137 +1,198 @@
 <script>
-    var myURL = "http://localhost:3000"
-    var name = "admin"
-    var pass = "supersecret"
-    // var myURL = "http://Clouda2-env.eba-2jxhdk7y.us-west-2.elasticbeanstalk.com"
-    function welcome() {
-        if (localStorage.getItem("id") != null) {
-            if (localStorage.getItem("current_username") == 'admin') {
-                document.getElementById("admin_head").hidden = false;
-            }
-            document.getElementById("user_dropdown").hidden = false;
-            document.getElementById("user_dropdown").innerHTML = '<i class="fa fa-fw fa-user"></i>' + localStorage.getItem("current_username");
-            document.getElementById("user_dropdown").style.backgroundColor = 'seagreen';
+  var myURL = "http://localhost:3000";
+  var name = "admin";
+  var pass = "supersecret";
+  // var myURL = "http://Clouda2-env.eba-2jxhdk7y.us-west-2.elasticbeanstalk.com"
+  function welcome() {
+    if (localStorage.getItem("id") != null) {
+      if (localStorage.getItem("current_username") == "admin") {
+        document.getElementById("admin_head").hidden = false;
+      }
+      document.getElementById("user_dropdown").hidden = false;
+      document.getElementById("user_dropdown").innerHTML =
+        '<i class="fa fa-fw fa-user"></i>' +
+        localStorage.getItem("current_username");
+      document.getElementById("user_dropdown").style.backgroundColor =
+        "seagreen";
 
-            document.getElementById("signin_head").hidden = true
-        }
-        console.log("welcome");
+      document.getElementById("signin_head").hidden = true;
     }
+    console.log("welcome");
+  }
 </script>
 
 <script>
-    function signout() {
-        localStorage.removeItem("current_username");
-        localStorage.removeItem("id");
-        document.getElementById("user_dropdown").hidden = true;
-        window.location.href = "home_page"
-    }
+  function signout() {
+    localStorage.removeItem("current_username");
+    localStorage.removeItem("id");
+    document.getElementById("user_dropdown").hidden = true;
+    window.location.href = "home_page";
+  }
 </script>
 
 <script>
-    function get(name) {
-        if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
-            return decodeURIComponent(name[1]);
-    }
+  function get(name) {
+    if (
+      (name = new RegExp("[?&]" + encodeURIComponent(name) + "=([^&]*)").exec(
+        location.search
+      ))
+    )
+      return decodeURIComponent(name[1]);
+  }
 </script>
 
 <script>
-    function getCurrentDateTime() {
-        var today = new Date();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date + ' ' + time;
-        return dateTime
-    }
+  function getCurrentDateTime() {
+    var today = new Date();
+    var date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
+    var time =
+      today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date + " " + time;
+    return dateTime;
+  }
 </script>
 
 <script>
-    function loading() {
-        localStorage.removeItem("current_username");
-        localStorage.removeItem("id");
-        document.getElementById("user_dropdown").hidden = true;
-        window.location.href = "home_page"
-    }
+  function loading() {
+    localStorage.removeItem("current_username");
+    localStorage.removeItem("id");
+    document.getElementById("user_dropdown").hidden = true;
+    window.location.href = "home_page";
+  }
 </script>
 
 <script>
-    function search() {
-        searchValue = document.getElementById("search_input").value
-        console.log(searchValue)
-        if (searchValue == "") {
-            window.location.href = "item_page?category=Shirt"
-        } else {
-            window.location.href = "item_page?name=" + searchValue
-        }
+  function search() {
+    searchValue = document.getElementById("search_input").value;
+    console.log(searchValue);
+    if (searchValue == "") {
+      window.location.href = "item_page?category=Shirt";
+    } else {
+      window.location.href = "item_page?name=" + searchValue;
     }
+  }
 </script>
 
 <nav class="navbar navbar-expand-lg navbar navbar-dark header-style">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
-        aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarTogglerDemo03"
+    aria-controls="navbarTogglerDemo03"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
-        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            <li class="nav-item">
-                <img src="../logo.png" height="20px" style="margin-top: 12px" />
-            </li>
+  <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+      <li class="nav-item">
+        <img src="../logo.png" height="20px" style="margin-top: 12px" />
+      </li>
 
-            <li class="nav-item active">
-                <a class="nav-link" href="home_page"><i class="fa fa-fw fa-home"></i>Home<span
-                        class="sr-only">(current)</span></a>
-            </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="home_page"
+          ><i class="fa fa-fw fa-home"></i>Home<span class="sr-only"
+            >(current)</span
+          ></a
+        >
+      </li>
 
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="#" id="shop_dropdown" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-fw fa-black-tie"></i>Shop
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="item_page?category=Shirt">Shirt</a>
-                    <a class="dropdown-item" href="item_page?category=Pant">Pant</a>
-                    <a class="dropdown-item" href="item_page?category=Shoe">Shoe</a>
-                </div>
-            </li>
+      <li class="nav-item dropdown active">
+        <a
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="shop_dropdown"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <i class="fa fa-fw fa-black-tie"></i>Shop
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="item_page?category=Shirt">Shirt</a>
+          <a class="dropdown-item" href="item_page?category=Pant">Pant</a>
+          <a class="dropdown-item" href="item_page?category=Shoe">Shoe</a>
+        </div>
+      </li>
 
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="#" id="cart_dropdown" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-fw fa-shopping-cart"></i>Cart
-                </a>
+      <li class="nav-item dropdown active">
+        <a
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="cart_dropdown"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <i class="fa fa-fw fa-shopping-cart"></i>Cart
+        </a>
 
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="cart_page">Current Cart</a>
-                    <a class="dropdown-item" href="cart_history_page">Purchase History</a>
-                </div>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="cart_page">Current Cart</a>
+          <a class="dropdown-item" href="cart_history_page">Purchase History</a>
+        </div>
 
-                <!-- <a class="nav-link" href="cart_page" id="cart_head"><i class="fa fa-fw fa-shopping-cart"></i>Cart</a> -->
-            </li>
+        <!-- <a class="nav-link" href="cart_page" id="cart_head"><i class="fa fa-fw fa-shopping-cart"></i>Cart</a> -->
+      </li>
 
-            <li class="nav-item dropdown active">
-                <a class="nav-link" href="sign_page" id="signin_head"><i class="fa fa-fw fa-user"></i>Signin</a>
-            </li>
+      <li class="nav-item dropdown active">
+        <a class="nav-link" href="sign_page" id="signin_head"
+          ><i class="fa fa-fw fa-user"></i>Signin</a
+        >
+      </li>
 
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="#" id="user_dropdown" data-toggle="dropdown"
-                    aria-haspopup="true" aria-expanded="false" style="border-radius: 3vh" hidden="true">
-                    <i class="fa fa-fw fa-user"></i></a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="#" onclick="signout()">Sign Out</a>
-                    <a class="dropdown-item" href="sign_page">Sign In With Another Account</a>
-                </div>
-            </li>
+      <li class="nav-item dropdown active">
+        <a
+          class="nav-link dropdown-toggle"
+          href="#"
+          id="user_dropdown"
+          data-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          style="border-radius: 3vh"
+          hidden="true"
+        >
+          <i class="fa fa-fw fa-user"></i
+        ></a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="#" onclick="signout()">Sign Out</a>
+          <a class="dropdown-item" href="sign_page"
+            >Sign In With Another Account</a
+          >
+        </div>
+      </li>
 
-            <li class="nav-item active">
-                <a class="nav-link" href="admin_page" id="admin_head" hidden="true"><i
-                        class="fa fa-fw fa-list"></i>Admin's Page</a>
-            </li>
-        </ul>
+      <li class="nav-item active">
+        <a class="nav-link" href="admin_page" id="admin_head" hidden="true"
+          ><i class="fa fa-fw fa-list"></i>Admin's Page</a
+        >
+      </li>
+    </ul>
 
-        <form class="form-inline my-2 my-lg-0">
-            <input id="search_input" class="form-control mr-sm-2" type="search" placeholder="Search Item's name" aria-label="Search">
-            <button class="btn btn-warning my-2 my-sm-0" type="button" style="color: #555" onclick="search()">
-                <i class="fa fa-fw fa-search"></i>Search</button>
-        </form>
-    </div>
+    <form class="form-inline my-2 my-lg-0">
+      <input
+        id="search_input"
+        class="form-control mr-sm-2"
+        type="search"
+        placeholder="Search Item's name"
+        aria-label="Search"
+      />
+      <button
+        class="btn btn-warning my-2 my-sm-0"
+        type="button"
+        style="color: #555"
+        onclick="search()"
+      >
+        <i class="fa fa-fw fa-search"></i>Search
+      </button>
+    </form>
+  </div>
 </nav>

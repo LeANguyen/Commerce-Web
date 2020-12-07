@@ -1,27 +1,28 @@
 // process.env
+// aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
+// 11223344
 var port = process.env.PORT || 3000;
-var user = process.env.RDS_USERNAME || 'postgres';
-var host = process.env.RDS_HOSTNAME || 'aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com';
-var password = process.env.RDS_PASSWORD || '11223344';
+var user = process.env.RDS_USERNAME || "postgres";
+var host = process.env.RDS_HOSTNAME || "localhost";
+var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
 var portDB = process.env.RDS_PORT || 5432;
 // aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
 
 // pg
-const Pool = require('pg').Pool;
+const Pool = require("pg").Pool;
 const pool = new Pool({
-    user: user,
-    host: host,
-    database: 'cloudDB',
-    password: password,
-    port: portDB,
+  user: user,
+  host: host,
+  database: "cloudDB",
+  password: password,
+  port: portDB
 });
 
 /**
  * Create Tables
  */
 const createTables = () => {
-    const queryText =
-        `CREATE TABLE client (
+  const queryText = `CREATE TABLE client (
             id serial,
             name varchar(255),
             email varchar(255),
@@ -60,47 +61,48 @@ const createTables = () => {
         
         INSERT INTO client (name, email, pass) VALUES ('admin', 'admin', '$2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW');
         INSERT INTO cart (client_id) VALUES (1);`;
-        // $2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW
-    pool.query(queryText)
-        .then((res) => {
-            console.log(res);
-            pool.end();
-        })
-        .catch((err) => {
-            console.log(err);
-            pool.end();
-        });
-}
+  // $2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW
+  pool
+    .query(queryText)
+    .then(res => {
+      console.log(res);
+      pool.end();
+    })
+    .catch(err => {
+      console.log(err);
+      pool.end();
+    });
+};
 
 /**
  * Drop Tables
  */
 const dropTables = () => {
-    const queryText = 
-        `DROP TABLE IF EXISTS cart_item; 
+  const queryText = `DROP TABLE IF EXISTS cart_item; 
         DROP TABLE IF EXISTS cart;
         DROP TABLE IF EXISTS item;
         DROP TABLE IF EXISTS client;`;
-        
-    pool.query(queryText)
-        .then((res) => {
-            console.log(res);
-            pool.end();
-        })
-        .catch((err) => {
-            console.log(err);
-            pool.end();
-        });
-}
 
-pool.on('remove', () => {
-    console.log('client removed');
-    process.exit(0);
+  pool
+    .query(queryText)
+    .then(res => {
+      console.log(res);
+      pool.end();
+    })
+    .catch(err => {
+      console.log(err);
+      pool.end();
+    });
+};
+
+pool.on("remove", () => {
+  console.log("client removed");
+  process.exit(0);
 });
 
 module.exports = {
-    createTables,
-    dropTables
+  createTables,
+  dropTables
 };
 
-require('make-runnable');
+require("make-runnable");

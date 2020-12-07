@@ -1,66 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+  <head>
+    <%- include('./partials/bootstrap') %> <%- include('./partials/header') %>
+  </head>
 
-<head>
-  <%- include('./partials/bootstrap') %>
-  <%- include('./partials/header') %>
-</head>
-
-<body class="body-style" onload="welcome(); loadItem()">
-  <!-- COLLECTION -->
-  <div class="container" style="padding: 1vw; text-align: center">
-    <h2 id="type_label" style="color: white"></h2>
-    <div class="card-columns" style="column-count: 3" id="card_col">
-      <!-- Item List -->
+  <body class="body-style" onload="welcome(); loadItem()">
+    <!-- COLLECTION -->
+    <div class="container" style="padding: 1vw; text-align: center">
+      <h2 id="type_label" style="color: white"></h2>
+      <div class="card-columns" id="card_col">
+        <!-- Item List -->
+      </div>
     </div>
-  </div>
-  <%- include('./partials/footer') %>
-</body>
+    <%- include('./partials/footer') %>
+  </body>
 
-<script>
-  function loadItem() {
-    var fetchURL = ""
-    if (get('category') != null) {
-      fetchURL = myURL + '/items/category/' + get('category')
-      document.getElementById("type_label").textContent = get('category') + " Collection"
-    }
+  <script>
+    function loadItem() {
+      var fetchURL = "";
+      if (get("category") != null) {
+        fetchURL = myURL + "/items/category/" + get("category");
+        document.getElementById("type_label").textContent =
+          get("category") + " Collection";
+      }
 
-    if (get('name') != null) {
-      fetchURL = myURL + '/items/name/' + get('name')
-      document.getElementById("type_label").textContent = "Search result(s) for " + "'" + get('name') + "'"
-    }
+      if (get("name") != null) {
+        fetchURL = myURL + "/items/name/" + get("name");
+        document.getElementById("type_label").textContent =
+          "Search result(s) for " + "'" + get("name") + "'";
+      }
 
-    fetch(fetchURL, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Basic ' + btoa(name + ":" + pass)
-      },
-    })
-      .then((res) => { return res.json() })
-      .then(async (data) => {
-        for (i = 0; i < data.length; i++) {
-          div = document.createElement('div');
-          div.id = data[i].id;
-          document.getElementById("card_col").appendChild(div)
+      fetch(fetchURL, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: "Basic " + btoa(name + ":" + pass)
+        }
+      })
+        .then(res => {
+          return res.json();
+        })
+        .then(async data => {
+          for (i = 0; i < data.length; i++) {
+            div = document.createElement("div");
+            div.id = data[i].id;
+            document.getElementById("card_col").appendChild(div);
 
-          var client_id = 0
-          if (localStorage.getItem("id") != null) {
-            client_id = localStorage.getItem("id")
-          }
-          await fetch(myURL + '/cart_item/current_cart/client_id/' + client_id + '/item_id/' + data[i].id, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': 'Basic ' + btoa(name + ":" + pass)
-            },
-            method: 'GET',
-          }).then((res_i) => { return res_i.json() })
-            .then((data_i) => {
-              if (data_i.length == 0) {
-                document.getElementById(div.id).innerHTML =
-                  `<div class="card">
+            var client_id = 0;
+            if (localStorage.getItem("id") != null) {
+              client_id = localStorage.getItem("id");
+            }
+            await fetch(
+              myURL +
+                "/cart_item/current_cart/client_id/" +
+                client_id +
+                "/item_id/" +
+                data[i].id,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Accept: "application/json",
+                  Authorization: "Basic " + btoa(name + ":" + pass)
+                },
+                method: "GET"
+              }
+            )
+              .then(res_i => {
+                return res_i.json();
+              })
+              .then(data_i => {
+                if (data_i.length == 0) {
+                  document.getElementById(
+                    div.id
+                  ).innerHTML = `<div class="card">
                     <img class="card-img-top" src="../uploaded_images/item${data[i].id}.png" alt="No Image">
                     <div class="card-body card-body-style">
                       <h4 class="card-title">${data[i].item_name}</h4>
@@ -74,9 +87,10 @@
                         <button class="btn btn-success rounded-pill py-2 btn-block" type="submit" id="add_to_cart_btn${data[i].id}" onclick="addToCart(${data[i].id})">Add to Cart</button>
                     </div>
                   </div>`;
-              } else {
-                document.getElementById(div.id).innerHTML =
-                  `<div class="card">
+                } else {
+                  document.getElementById(
+                    div.id
+                  ).innerHTML = `<div class="card">
                     <img class="card-img-top" src="../uploaded_images/item${data[i].id}.png" alt="No Image">
                     <div class="card-body card-body-style">
                       <h4 class="card-title">${data[i].item_name}</h4>
@@ -90,14 +104,13 @@
                         <button class="btn btn-danger rounded-pill py-2 btn-block" type="submit" id="add_to_cart_btn${data[i].id}" onclick="removeFromCart(${data[i].id})">Remove from Cart</button>
                     </div>
                   </div>`;
-              }
-            })
-        }
-        checkSignedIn()
-      })
-  }
-</script>
+                }
+              });
+          }
+          checkSignedIn();
+        });
+    }
+  </script>
 
-<%- include('./partials/item_card') %>
-
+  <%- include('./partials/item_card') %>
 </html>

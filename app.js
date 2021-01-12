@@ -214,7 +214,7 @@ app.get("/image", (req, res) => {
 //   else console.log("Bucket Created Successfully", data.Location);
 // });
 
-app.listen(port, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log(process.env.AWS_ACCESS_KEY);
   console.log(`App running on port ${port}.`);
 });

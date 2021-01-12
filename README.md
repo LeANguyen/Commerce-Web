@@ -3,3 +3,4 @@
   https://red-fashion-backend.herokuapp.com/
 - There are mock frontend (html), but it is only for my school project back then.
 - For the ReactJS app designed to use this backend, see: https://red-fashion.herokuapp.com/
+- Frontend git: https://github.com/LeANguyen/Red-Fashion

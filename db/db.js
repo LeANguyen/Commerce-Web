@@ -9,14 +9,27 @@ var portDB = process.env.RDS_PORT || 5432;
 // aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
 
 // pg
-const Pool = require("pg").Pool;
-const pool = new Pool({
-  user: user,
-  host: host,
-  database: "cloudDB",
-  password: password,
-  port: portDB
+// const Pool = require("pg").Pool;
+// const pool = new Pool({
+//   user: user,
+//   host: host,
+//   database: "cloudDB",
+//   password: password,
+//   port: portDB
+// });
+
+const { Client } = require("pg");
+
+const pool = new Client({
+  connectionString:
+    process.env.DATABASE_URL ||
+    "postgres://zakavourbbpvhk:6e9a933dc4614e8d99ca6eaf1a262c8af0f7230978e5e17d34182f0afcff550b@ec2-34-195-169-25.compute-1.amazonaws.com:5432/d1fm0d7qcjkujj",
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
+
+pool.connect();
 
 /**
  * Create Tables
@@ -102,7 +115,8 @@ pool.on("remove", () => {
 
 module.exports = {
   createTables,
-  dropTables
+  dropTables,
+  pool
 };
 
 require("make-runnable");

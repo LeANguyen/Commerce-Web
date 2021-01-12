@@ -1,3 +1,5 @@
+var db = require("./db");
+
 // process.env
 var port = process.env.PORT || 3000;
 var user = process.env.RDS_USERNAME || "postgres";
@@ -6,14 +8,16 @@ var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
 var portDB = process.env.RDS_PORT || 5432;
 
 // pg
-const Pool = require("pg").Pool;
-const pool = new Pool({
-  user: user,
-  host: host,
-  database: "cloudDB",
-  password: password,
-  port: portDB
-});
+// const Pool = require("pg").Pool;
+// const pool = new Pool({
+//   user: user,
+//   host: host,
+//   database: "cloudDB",
+//   password: password,
+//   port: portDB
+// });
+
+const pool = db.pool;
 
 // cart_item
 const addItemIntoCurrentCart = (request, response) => {

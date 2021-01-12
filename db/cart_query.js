@@ -1,83 +1,94 @@
+var db = require("./db");
+
 // process.env
 var port = process.env.PORT || 3000;
-var user = process.env.RDS_USERNAME || 'postgres';
-var host = process.env.RDS_HOSTNAME || 'localhost';
-var password = process.env.RDS_PASSWORD || 'Lifeis2great4me';
+var user = process.env.RDS_USERNAME || "postgres";
+var host = process.env.RDS_HOSTNAME || "localhost";
+var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
 var portDB = process.env.RDS_PORT || 5432;
 
 // pg
-const Pool = require('pg').Pool;
-const pool = new Pool({
-    user: user,
-    host: host,
-    database: 'cloudDB',
-    password: password,
-    port: portDB,
-});
+// const Pool = require('pg').Pool;
+// const pool = new Pool({
+//     user: user,
+//     host: host,
+//     database: 'cloudDB',
+//     password: password,
+//     port: portDB,
+// });
+
+const pool = db.pool;
 
 // Cart
 const getCurrentCart = (request, response) => {
-    const client_id = request.params.client_id
+  const client_id = request.params.client_id;
 
-    const queryText = 
-        `SELECT * 
+  const queryText = `SELECT * 
         FROM cart
         WHERE id = (SELECT MAX(id) 
                     FROM (SELECT * FROM cart WHERE client_id = $1) AS X)`;
 
-    pool.query(queryText, [client_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
-}
+  pool.query(queryText, [client_id], (error, results) => {
+    if (error) {
+      throw error;
+    }
+    response.status(200).json(results.rows);
+  });
+};
 
 const getAllCart = (request, response) => {
-    const client_id = request.params.client_id
+  const client_id = request.params.client_id;
 
-    pool.query('SELECT * FROM cart WHERE client_id = $1', [client_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json(results.rows)
-    })
-}
+  pool.query(
+    "SELECT * FROM cart WHERE client_id = $1",
+    [client_id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json(results.rows);
+    }
+  );
+};
 
 const createCart = (request, response) => {
-    const client_id = request.params.client_id
+  const client_id = request.params.client_id;
 
-    pool.query('INSERT INTO cart (client_id) VALUES ($1)', [client_id], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(200).json({ "result":"CartAdded" })
-    })
-}
+  pool.query(
+    "INSERT INTO cart (client_id) VALUES ($1)",
+    [client_id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json({ result: "CartAdded" });
+    }
+  );
+};
 
 const updateCurrentCart = (request, response) => {
-    const client_id = request.params.client_id
-    const client_name = request.body.client_name
-    const address = request.body.address
-    const phone = request.body.phone
-    const checkout_date = request.body.checkout_date
+  const client_id = request.params.client_id;
+  const client_name = request.body.client_name;
+  const address = request.body.address;
+  const phone = request.body.phone;
+  const checkout_date = request.body.checkout_date;
 
-    pool.query(
-        `UPDATE cart SET client_name = $1, address = $2, phone = $3, checkout_date = $4
+  pool.query(
+    `UPDATE cart SET client_name = $1, address = $2, phone = $3, checkout_date = $4
         WHERE id = (SELECT MAX(id) FROM (SELECT * FROM cart WHERE client_id = $5) AS X)`,
-        [client_name, address, phone, checkout_date, client_id],
-        (error, results) => {
-            if (error) {
-                throw error
-            }
-            response.status(200).json({ "result":"CurrentCartUpdated" })
-        }
-    )
-}
+    [client_name, address, phone, checkout_date, client_id],
+    (error, results) => {
+      if (error) {
+        throw error;
+      }
+      response.status(200).json({ result: "CurrentCartUpdated" });
+    }
+  );
+};
 
 module.exports = {
-    getCurrentCart,
-    getAllCart,
-    createCart,
-    updateCurrentCart,
-}
+  getCurrentCart,
+  getAllCart,
+  createCart,
+  updateCurrentCart
+};

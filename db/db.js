@@ -1,6 +1,8 @@
 // process.env
 // aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
 // 11223344
+require("dotenv").config();
+
 var port = process.env.PORT || 3000;
 var user = process.env.RDS_USERNAME || "postgres";
 var host = process.env.RDS_HOSTNAME || "localhost";
@@ -21,9 +23,7 @@ var portDB = process.env.RDS_PORT || 5432;
 const { Client } = require("pg");
 
 const pool = new Client({
-  connectionString:
-    process.env.DATABASE_URL ||
-    "postgres://zakavourbbpvhk:6e9a933dc4614e8d99ca6eaf1a262c8af0f7230978e5e17d34182f0afcff550b@ec2-34-195-169-25.compute-1.amazonaws.com:5432/d1fm0d7qcjkujj",
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }

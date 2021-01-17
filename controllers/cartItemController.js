@@ -1,7 +1,5 @@
 const db = require("../db");
 
-const pool = db.pool;
-
 // cart_item
 const addItemIntoCurrentCart = (request, response) => {
   const item_id = request.params.item_id;
@@ -14,7 +12,7 @@ const addItemIntoCurrentCart = (request, response) => {
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1), $3)`;
 
-  pool.query(queryText, [item_id, client_id, quantity], (error, results) => {
+  db.query(queryText, [item_id, client_id, quantity], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -30,7 +28,7 @@ const getAllItemByCartID = (request, response) => {
   INNER JOIN cart_item ON cart_item.item_id = item.id 
   INNER JOIN cart ON cart_item.cart_id = cart.id 
   WHERE cart_id=$1`;
-  pool.query(queryText, [cart_id], (error, results) => {
+  db.query(queryText, [cart_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -59,7 +57,7 @@ const getItemFromCurrentCartByItemID = (request, response) => {
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1)`;
 
-  pool.query(queryText, [item_id, client_id], (error, results) => {
+  db.query(queryText, [item_id, client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -78,7 +76,7 @@ const getAllItemFromCurrentCart = (request, response) => {
     FROM cart 
     WHERE client_id=$1 ORDER BY id DESC LIMIT 1)`;
 
-  pool.query(queryText, [client_id], (error, results) => {
+  db.query(queryText, [client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -97,7 +95,7 @@ const updateItemQuantityFromCurrentCart = (request, response) => {
     SELECT id 
     FROM cart 
     WHERE client_id=$3 ORDER BY id DESC LIMIT 1)`;
-  pool.query(queryText, [quantity, item_id, client_id], (error, results) => {
+  db.query(queryText, [quantity, item_id, client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -115,7 +113,7 @@ const deleteItemFromCurrentCart = (request, response) => {
     SELECT id 
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1)`;
-  pool.query(queryText, [item_id, client_id], (error, results) => {
+  db.query(queryText, [item_id, client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }

@@ -7,7 +7,7 @@ const getCurrentCart = (request, response) => {
   const client_id = request.params.client_id;
 
   const queryText = `
-  SELECT * 
+  SELECT * ASS
   FROM cart
   WHERE id = (
     SELECT MAX(id) 

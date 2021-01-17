@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+// API
 const express = require("express");
 const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
@@ -7,6 +8,8 @@ const fileupload = require("express-fileupload");
 // AWS
 const fs = require("fs");
 const AWS = require("aws-sdk");
+
+// CORS
 var cors = require("cors");
 
 const s3 = new AWS.S3({
@@ -43,43 +46,43 @@ app.set("view engine", "ejs");
 const basicAuth = require("express-basic-auth");
 
 // view render
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
   res.render("home");
 });
 
-app.get("/home_page", function(req, res) {
+app.get("/home_page", function (req, res) {
   res.render("home");
 });
 
-app.get("/item_page", function(req, res) {
+app.get("/item_page", function (req, res) {
   res.render("item");
 });
 
-app.get("/item_detail_page", function(req, res) {
+app.get("/item_detail_page", function (req, res) {
   res.render("item_detail");
 });
 
-app.get("/about", function(req, res) {
+app.get("/about", function (req, res) {
   res.render("about");
 });
 
-app.get("/sign_page", function(req, res) {
+app.get("/sign_page", function (req, res) {
   res.render("sign");
 });
 
-app.get("/cart_page", function(req, res) {
+app.get("/cart_page", function (req, res) {
   res.render("cart");
 });
 
-app.get("/cart_history_page", function(req, res) {
+app.get("/cart_history_page", function (req, res) {
   res.render("cart_history");
 });
 
-app.get("/cart_detail_page", function(req, res) {
+app.get("/cart_detail_page", function (req, res) {
   res.render("cart_detail");
 });
 
-app.get("/admin_page", function(req, res) {
+app.get("/admin_page", function (req, res) {
   res.render("admin");
 });
 
@@ -97,6 +100,8 @@ app.get("/client/email/:email", client_db.getClientByEmail); // to check unused 
 // item
 app.post("/item", item_db.createItem);
 app.get("/items", item_db.getAllItem);
+app.get("/items/start", item_db.getStartItem);
+app.get("/items/more/id/:id", item_db.getMoreItem)
 app.get("/items/category/:category", item_db.getAllItemByCategory);
 app.get("/items/name/:name", item_db.getAllItemByName);
 app.get("/current_item", item_db.getCurrentItem);
@@ -173,7 +178,7 @@ app.post("/image", (req, res) => {
   };
 
   // Uploading files to the bucket
-  s3.upload(params, function(err, data) {
+  s3.upload(params, function (err, data) {
     if (err) {
       throw err;
     }

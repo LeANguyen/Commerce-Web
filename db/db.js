@@ -1,14 +1,11 @@
 // process.env
-// aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
-// 11223344
 require("dotenv").config();
 
-var port = process.env.PORT || 3000;
-var user = process.env.RDS_USERNAME || "postgres";
-var host = process.env.RDS_HOSTNAME || "localhost";
-var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
-var portDB = process.env.RDS_PORT || 5432;
-// aama4nh59pwany.c3oety19zjax.us-west-2.rds.amazonaws.com
+// var port = process.env.PORT || 3000;
+// var user = process.env.RDS_USERNAME || "postgres";
+// var host = process.env.RDS_HOSTNAME || "localhost";
+// var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
+// var portDB = process.env.RDS_PORT || 5432;
 
 // pg
 // const Pool = require("pg").Pool;
@@ -95,7 +92,6 @@ const dropTables = () => {
         DROP TABLE IF EXISTS cart;
         DROP TABLE IF EXISTS item;
         DROP TABLE IF EXISTS client;`;
-
   pool
     .query(queryText)
     .then(res => {

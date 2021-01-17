@@ -1,22 +1,5 @@
 var db = require("./db");
 
-// process.env
-var port = process.env.PORT || 3000;
-var user = process.env.RDS_USERNAME || "postgres";
-var host = process.env.RDS_HOSTNAME || "localhost";
-var password = process.env.RDS_PASSWORD || "Lifeis2great4me";
-var portDB = process.env.RDS_PORT || 5432;
-
-// pg
-// const Pool = require("pg").Pool;
-// const pool = new Pool({
-//   user: user,
-//   host: host,
-//   database: "cloudDB",
-//   password: password,
-//   port: portDB
-// });
-
 const pool = db.pool;
 
 // Item
@@ -26,13 +9,13 @@ const createItem = (request, response) => {
   const origin = request.body.origin;
   const price = request.body.price;
   const description = request.body.description;
-
+  const queryText = `INSERT INTO item (item_name, category, origin, price , description) VALUES ($1, $2, $3, $4, $5)`
   pool.query(
-    "INSERT INTO item (item_name, category, origin, price , description) VALUES ($1, $2, $3, $4, $5)",
+    queryText,
     [item_name, category, origin, price, description],
     (error, results) => {
       if (error) {
-        throw error;
+        return console.error(error.message);
       }
       response.status(200).json({ result: "ItemAdded" });
     }
@@ -40,22 +23,45 @@ const createItem = (request, response) => {
 };
 
 const getAllItem = (request, response) => {
-  pool.query("SELECT * FROM item ORDER BY id ASC", (error, results) => {
+  const queryText = `SELECT * FROM item ORDER BY id ASC;`
+  pool.query(queryText, (error, results) => {
     if (error) {
-      throw error;
+      return console.error(error.message);
     }
     response.status(200).json(results.rows);
   });
 };
 
+const getStartItem = (request, response) => {
+  const queryText = `SELECT * FROM item ORDER BY id DESC LIMIT 3;`
+  pool.query(queryText, (error, results) => {
+    if (error) {
+      return console.error(error.message);
+    }
+    response.status(200).json(results.rows);
+  });
+}
+
+const getMoreItem = (request, response) => {
+  const id = request.params.id
+  const queryText = `SELECT * FROM item WHERE id < $1 ORDER BY id DESC LIMIT 3;`
+  pool.query(queryText, [id], (error, results) => {
+    if (error) {
+      return console.error(error.message);
+    }
+    response.status(200).json(results.rows);
+  });
+}
+
 const getAllItemByCategory = (request, response) => {
   const category = request.params.category;
+  const queryText = `SELECT * FROM item WHERE category = $1 ORDER BY id ASC`
   pool.query(
-    "SELECT * FROM item WHERE category = $1 ORDER BY id ASC",
+    queryText,
     [category],
     (error, results) => {
       if (error) {
-        throw error;
+        return console.error(error.message);
       }
       response.status(200).json(results.rows);
     }
@@ -64,21 +70,22 @@ const getAllItemByCategory = (request, response) => {
 
 const deleteItem = (request, response) => {
   const id = request.params.id;
-
-  pool.query(`DELETE FROM item WHERE id = $1`, [id], (error, results) => {
+  const queryText = `DELETE FROM item WHERE id = $1`
+  pool.query(queryText, [id], (error, results) => {
     if (error) {
-      throw error;
+      return console.error(error.message);
     }
     response.status(200).json({ result: "ItemDeleted" });
   });
 };
 
 const getCurrentItem = (request, response) => {
+  const queryText = `SELECT MAX(id) FROM (SELECT * FROM item) AS X`
   pool.query(
-    "SELECT MAX(id) FROM (SELECT * FROM item) AS X",
+    queryText,
     (error, results) => {
       if (error) {
-        throw error;
+        return console.error(error.message);
       }
       response.status(200).json(results.rows);
     }
@@ -87,10 +94,10 @@ const getCurrentItem = (request, response) => {
 
 const getItemByID = (request, response) => {
   const id = request.params.id;
-
-  pool.query("SELECT * FROM item WHERE id=$1", [id], (error, results) => {
+  const queryText = `SELECT * FROM item WHERE id=$1`
+  pool.query(queryText, [id], (error, results) => {
     if (error) {
-      throw error;
+      return console.error(error.message);
     }
     response.status(200).json(results.rows);
   });
@@ -98,12 +105,11 @@ const getItemByID = (request, response) => {
 
 const getAllItemByName = (request, response) => {
   const name = request.params.name;
-
   pool.query(
     "SELECT * FROM item WHERE UPPER(item_name) LIKE UPPER('%" + name + "%')",
     (error, results) => {
       if (error) {
-        throw error;
+        return console.error(error.message);
       }
       response.status(200).json(results.rows);
     }
@@ -117,14 +123,16 @@ const updateItem = (request, response) => {
   const origin = request.body.origin;
   const price = request.body.price;
   const description = request.body.description;
-
+  const queryText = `
+  UPDATE item 
+  SET item_name = $1, category = $2, origin = $3, price = $4, description = $5 
+  WHERE id = $6`
   pool.query(
-    `UPDATE item SET item_name = $1, category = $2, origin = $3, price = $4, description = $5 
-        WHERE id = $6`,
+    queryText,
     [item_name, category, origin, price, description, id],
     (error, results) => {
       if (error) {
-        throw error;
+        return console.error(error.message);
       }
       response.status(200).json({ result: "ItemUpdated" });
     }
@@ -134,6 +142,8 @@ const updateItem = (request, response) => {
 module.exports = {
   createItem,
   getAllItem,
+  getStartItem,
+  getMoreItem,
   getAllItemByCategory,
   getCurrentItem,
   getItemByID,

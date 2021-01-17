@@ -1,7 +1,5 @@
 const db = require("../db");
 
-const pool = db.pool;
-
 const createItem = (request, response) => {
   const item_name = request.body.item_name;
   const category = request.body.category;
@@ -9,7 +7,7 @@ const createItem = (request, response) => {
   const price = request.body.price;
   const description = request.body.description;
   const queryText = `INSERT INTO item (item_name, category, origin, price, description) VALUES ($1, $2, $3, $4, $5)`;
-  pool.query(
+  db.query(
     queryText,
     [item_name, category, origin, price, description],
     (error, results) => {
@@ -23,7 +21,7 @@ const createItem = (request, response) => {
 
 const getAllItem = (request, response) => {
   const queryText = `SELECT * FROM item ORDER BY id ASC;`;
-  pool.query(queryText, (error, results) => {
+  db.query(queryText, (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -33,7 +31,7 @@ const getAllItem = (request, response) => {
 
 const getStartItem = (request, response) => {
   const queryText = `SELECT * FROM item ORDER BY id DESC LIMIT 3;`;
-  pool.query(queryText, (error, results) => {
+  db.query(queryText, (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -44,7 +42,7 @@ const getStartItem = (request, response) => {
 const getMoreItem = (request, response) => {
   const id = request.params.id;
   const queryText = `SELECT * FROM item WHERE id < $1 ORDER BY id DESC LIMIT 3;`;
-  pool.query(queryText, [id], (error, results) => {
+  db.query(queryText, [id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -55,7 +53,7 @@ const getMoreItem = (request, response) => {
 const getAllItemByCategory = (request, response) => {
   const category = request.params.category;
   const queryText = `SELECT * FROM item WHERE category = $1 ORDER BY id ASC`;
-  pool.query(queryText, [category], (error, results) => {
+  db.query(queryText, [category], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -66,7 +64,7 @@ const getAllItemByCategory = (request, response) => {
 const deleteItem = (request, response) => {
   const id = request.params.id;
   const queryText = `DELETE FROM item WHERE id = $1`;
-  pool.query(queryText, [id], (error, results) => {
+  db.query(queryText, [id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -76,7 +74,7 @@ const deleteItem = (request, response) => {
 
 const getCurrentItem = (request, response) => {
   const queryText = `SELECT MAX(id) FROM (SELECT * FROM item) AS X`;
-  pool.query(queryText, (error, results) => {
+  db.query(queryText, (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -87,7 +85,7 @@ const getCurrentItem = (request, response) => {
 const getItemByID = (request, response) => {
   const id = request.params.id;
   const queryText = `SELECT * FROM item WHERE id=$1`;
-  pool.query(queryText, [id], (error, results) => {
+  db.query(queryText, [id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -97,7 +95,7 @@ const getItemByID = (request, response) => {
 
 const getAllItemByName = (request, response) => {
   const name = request.params.name;
-  pool.query(
+  db.query(
     "SELECT * FROM item WHERE UPPER(item_name) LIKE UPPER('%" + name + "%')",
     (error, results) => {
       if (error) {
@@ -119,7 +117,7 @@ const updateItem = (request, response) => {
   UPDATE item 
   SET item_name = $1, category = $2, origin = $3, price = $4, description = $5 
   WHERE id = $6`;
-  pool.query(
+  db.query(
     queryText,
     [item_name, category, origin, price, description, id],
     (error, results) => {

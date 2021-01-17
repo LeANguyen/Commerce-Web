@@ -1,7 +1,5 @@
 const db = require("../db");
 
-const pool = db.pool;
-
 // Cart
 const getCurrentCart = (request, response) => {
   const client_id = request.params.client_id;
@@ -16,7 +14,7 @@ const getCurrentCart = (request, response) => {
       FROM cart 
       WHERE client_id = $1) AS X)`;
 
-  pool.query(queryText, [client_id], (error, results) => {
+  db.query(queryText, [client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -27,7 +25,7 @@ const getCurrentCart = (request, response) => {
 const getAllCart = (request, response) => {
   const client_id = request.params.client_id;
   const queryText = `SELECT * FROM cart WHERE client_id = $1`;
-  pool.query(queryText, [client_id], (error, results) => {
+  db.query(queryText, [client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -38,7 +36,7 @@ const getAllCart = (request, response) => {
 const createCart = (request, response) => {
   const client_id = request.params.client_id;
   const queryText = `INSERT INTO cart (client_id) VALUES ($1)`;
-  pool.query(queryText, [client_id], (error, results) => {
+  db.query(queryText, [client_id], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -61,7 +59,7 @@ const updateCurrentCart = (request, response) => {
       SELECT * 
       FROM cart 
       WHERE client_id = $5) AS X)`;
-  pool.query(
+  db.query(
     queryText,
     [client_name, address, phone, checkout_date, client_id],
     (error, results) => {

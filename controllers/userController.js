@@ -4,8 +4,6 @@ const db = require("../db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const pool = db.pool;
-
 // Client
 const createClient = (request, response) => {
   const email = request.body.email;
@@ -15,7 +13,7 @@ const createClient = (request, response) => {
   bcrypt.genSalt(saltRounds, function(err, salt) {
     bcrypt.hash(pass, salt, function(err, hash) {
       // store hashed password in DB
-      pool.query(queryText, [name, email, hash], (error, results) => {
+      db.query(queryText, [name, email, hash], (error, results) => {
         if (error) {
           return console.error(error.message);
         }
@@ -28,7 +26,7 @@ const createClient = (request, response) => {
 const getClientByEmail = (request, response) => {
   const email = request.params.email;
   const queryText = `SELECT (email, id) FROM client WHERE email = $1`;
-  pool.query(queryText, [email], (error, results) => {
+  db.query(queryText, [email], (error, results) => {
     if (error) {
       return console.error(error.message);
     }
@@ -40,7 +38,7 @@ const getClientByEmailAndPass = (request, response) => {
   const email = request.body.email;
   const pass = request.body.pass;
   const queryText = `SELECT * FROM client WHERE email = $1`;
-  pool.query(queryText, [email], (error, results) => {
+  db.query(queryText, [email], (error, results) => {
     if (error) {
       return console.error(error.message);
     }

@@ -370,7 +370,7 @@
               headers: {
                 'Authorization': 'Basic ' + btoa(name + ":" + pass)
               },
-              method: 'PUT',
+              method: 'POST',
               body: formData
             })
               .then((upload_res) => { return upload_res.json() })

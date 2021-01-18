@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const db = require("../db");
-const userController = require("../controllers/userController");
 
 const verifyToken = async (req, res, next) => {
   const success = false;

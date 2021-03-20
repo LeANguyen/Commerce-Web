@@ -1,12 +1,13 @@
 const db = require("./index");
 
-const createTables = () => {
+const createTables = async () => {
   const createUserTable = `
   CREATE TABLE client (
       id serial,
       name varchar(255),
       email varchar(255),
       pass varchar(255),
+      role varchar(255),
       PRIMARY KEY(id)
       );`;
 
@@ -43,27 +44,35 @@ const createTables = () => {
       );`;
 
   const createAdmin = `
-  INSERT INTO client (name, email, pass) 
-  VALUES ('admin', 'admin', '$2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW');
+  INSERT INTO client (name, email, role,pass) 
+  VALUES ('admin', 'admin', 'admin', '$2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW');
   INSERT INTO cart (client_id) VALUES (1);`;
 
   const queryText =
     createUserTable +
     createCartTable +
     createItemTable +
-    createCartTable +
     createCartItemTable +
     createAdmin;
 
-  db.query(queryText)
-    .then(res => {
-      console.log(res);
-      db.end();
-    })
-    .catch(err => {
-      console.log(err);
-      db.end();
-    });
+  try {
+    const result = await db.query(queryText);
+    console.log(result);
+  } catch (error) {
+    console.error(error.message);
+  }
+  db.end();
+
+  // db.query(queryText)
+  //   .then(res => {
+  //     console.log(res);
+  //     db.end();
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     db.end();
+  //   });
 };
 
 module.exports = createTables;
+require("make-runnable");

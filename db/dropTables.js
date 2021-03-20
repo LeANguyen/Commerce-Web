@@ -1,20 +1,28 @@
 const db = require("./index");
-const dropTables = () => {
+const dropTables = async () => {
   const queryText = `
   DROP TABLE IF EXISTS cart_item; 
   DROP TABLE IF EXISTS cart;
   DROP TABLE IF EXISTS item;
   DROP TABLE IF EXISTS client;`;
 
-  db.query(queryText)
-    .then(res => {
-      console.log(res);
-      db.end();
-    })
-    .catch(err => {
-      console.log(err);
-      db.end();
-    });
+  try {
+    const result = await db.query(queryText);
+    console.log(result);
+  } catch (error) {
+    console.error(error.message);
+  }
+  db.end();
+
+  // db.query(queryText)
+  //   .then(res => {
+  //     console.log(res);
+  //     db.end();
+  //   })
+  //   .catch(err => {
+  //     console.log(err);
+  //     db.end();
+  //   });
 };
 
 db.on("remove", () => {
@@ -23,3 +31,4 @@ db.on("remove", () => {
 });
 
 module.exports = dropTables;
+require("make-runnable");

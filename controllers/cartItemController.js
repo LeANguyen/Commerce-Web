@@ -1,7 +1,7 @@
 const db = require("../db");
 
 // cart_item
-const addItemIntoCurrentCart = (request, response) => {
+const addItemIntoCurrentCart = async (request, response, next) => {
   const item_id = request.params.item_id;
   const client_id = request.params.client_id;
   const quantity = request.body.quantity;
@@ -12,15 +12,17 @@ const addItemIntoCurrentCart = (request, response) => {
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1), $3)`;
 
-  db.query(queryText, [item_id, client_id, quantity], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
+  try {
+    const result = await db.query(queryText, [item_id, client_id, quantity]);
     response.status(200).json({ result: "ItemAddedToCurrentCart" });
-  });
+  } catch (error) {
+    console.log("addItemIntoCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const getAllItemByCartID = (request, response) => {
+const getAllItemByCartId = async (request, response, next) => {
   const cart_id = request.params.cart_id;
   const queryText = `
   SELECT cart_item.item_id, item.item_name, item.category, item.origin, item.price, cart_item.cart_id, cart_item.quantity, cart.address, cart.client_name, cart.phone, cart.checkout_date 
@@ -28,26 +30,20 @@ const getAllItemByCartID = (request, response) => {
   INNER JOIN cart_item ON cart_item.item_id = item.id 
   INNER JOIN cart ON cart_item.cart_id = cart.id 
   WHERE cart_id=$1`;
-  db.query(queryText, [cart_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
+
+  try {
+    const result = await db.query(queryText, [cart_id]);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("getAllItemByCartId error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const getItemFromCurrentCartByItemID = (request, response) => {
+const getItemFromCurrentCartByItemId = async (request, response, next) => {
   const item_id = request.params.item_id;
   const client_id = request.params.client_id;
-  // const queryText = `
-  // SELECT *
-  // FROM cart_item
-  // WHERE item_id = $1 AND cart_id=(
-  //   SELECT MAX(id)
-  //   FROM (
-  //     SELECT *
-  //     FROM cart
-  //     WHERE client_id = $2) AS X)`;
 
   const queryText = `
   SELECT * 
@@ -57,15 +53,17 @@ const getItemFromCurrentCartByItemID = (request, response) => {
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1)`;
 
-  db.query(queryText, [item_id, client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
+  try {
+    const result = await db.query(queryText, [item_id, client_id]);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("getItemFromCurrentCartByItemId error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const getAllItemFromCurrentCart = (request, response) => {
+const getAllItemFromCurrentCart = async (request, response, next) => {
   const client_id = request.params.client_id;
   const queryText = `
   SELECT cart_item.item_id, item.item_name, item.category, item.origin, item.price, cart_item.cart_id, cart_item.quantity 
@@ -76,15 +74,17 @@ const getAllItemFromCurrentCart = (request, response) => {
     FROM cart 
     WHERE client_id=$1 ORDER BY id DESC LIMIT 1)`;
 
-  db.query(queryText, [client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
+  try {
+    const result = await db.query(queryText, [client_id]);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("getAllItemFromCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const updateItemQuantityFromCurrentCart = (request, response) => {
+const updateItemQuantityFromCurrentCart = async (request, response, next) => {
   const quantity = request.body.quantity;
   const item_id = request.params.item_id;
   const client_id = request.params.client_id;
@@ -95,15 +95,25 @@ const updateItemQuantityFromCurrentCart = (request, response) => {
     SELECT id 
     FROM cart 
     WHERE client_id=$3 ORDER BY id DESC LIMIT 1)`;
-  db.query(queryText, [quantity, item_id, client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
+
+  try {
+    const result = await db.query(queryText, [quantity, item_id, client_id]);
     response.status(200).json({ result: "ItemUpdatedFromCurrentCart" });
-  });
+  } catch (error) {
+    console.log("updateItemQuantityFromCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
+
+  // db.query(queryText, [quantity, item_id, client_id], (error, results) => {
+  //   if (error) {
+  //     return console.log(error.message);
+  //   }
+  //   response.status(200).json({ result: "ItemUpdatedFromCurrentCart" });
+  // });
 };
 
-const deleteItemFromCurrentCart = (request, response) => {
+const deleteItemFromCurrentCart = async (request, response, next) => {
   const item_id = request.params.item_id;
   const client_id = request.params.client_id;
   const queryText = `
@@ -113,18 +123,28 @@ const deleteItemFromCurrentCart = (request, response) => {
     SELECT id 
     FROM cart 
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1)`;
-  db.query(queryText, [item_id, client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
+
+  try {
+    const result = await db.query(queryText, [item_id, client_id]);
     response.status(200).json({ result: "ItemDeletedFromCurrentCart" });
-  });
+  } catch (error) {
+    console.log("deleteItemFromCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
+
+  // db.query(queryText, [item_id, client_id], (error, results) => {
+  //   if (error) {
+  //     return console.log(error.message);
+  //   }
+  //   response.status(200).json({ result: "ItemDeletedFromCurrentCart" });
+  // });
 };
 
 module.exports = {
   addItemIntoCurrentCart,
-  getAllItemByCartID,
-  getItemFromCurrentCartByItemID,
+  getAllItemByCartId,
+  getItemFromCurrentCartByItemId,
   getAllItemFromCurrentCart,
   updateItemQuantityFromCurrentCart,
   deleteItemFromCurrentCart

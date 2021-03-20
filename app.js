@@ -17,6 +17,8 @@ const cartRoutes = require("./routes/cartRoutes");
 const imageRoutes = require("./routes/imageRoutes");
 const viewRoutes = require("./routes/viewRoutes");
 
+// middlewares
+
 // API
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -28,7 +30,6 @@ const basicAuth = require("express-basic-auth");
 
 // config app
 const app = express();
-
 app.use(cors());
 app.options("*", cors());
 
@@ -45,11 +46,11 @@ app.set("view engine", "ejs");
 // view
 app.use("", viewRoutes);
 
-app.use(
-  basicAuth({
-    users: { admin: "supersecret" }
-  })
-);
+// app.use(
+//   basicAuth({
+//     users: { admin: "supersecret" }
+//   })
+// );
 
 // client
 app.use("", userRoutes);
@@ -65,6 +66,9 @@ app.use("", cartItemRoutes);
 
 // image
 app.use("", imageRoutes);
+
+const handleError = require("./middlewares/handleError");
+app.use(handleError);
 
 // upload_image function
 // app.put("/image", (req, res) => {

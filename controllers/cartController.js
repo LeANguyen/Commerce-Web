@@ -1,7 +1,7 @@
 const db = require("../db");
 
 // Cart
-const getCurrentCart = (request, response) => {
+const getCurrentCart = async (request, response, next) => {
   const client_id = request.params.client_id;
 
   const queryText = `
@@ -14,37 +14,44 @@ const getCurrentCart = (request, response) => {
       FROM cart 
       WHERE client_id = $1) AS X)`;
 
-  db.query(queryText, [client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
+  try {
+    const result = await db.query(queryText, [client_id]);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("getCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const getAllCart = (request, response) => {
+const getAllCart = async (request, response, next) => {
   const client_id = request.params.client_id;
   const queryText = `SELECT * FROM cart WHERE client_id = $1`;
-  db.query(queryText, [client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
+
+  try {
+    const result = await db.query(queryText, [client_id]);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("getAllCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const createCart = (request, response) => {
+const createCart = async (request, response, next) => {
   const client_id = request.params.client_id;
   const queryText = `INSERT INTO cart (client_id) VALUES ($1)`;
-  db.query(queryText, [client_id], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
+  try {
+    const result = await db.query(queryText, [client_id]);
     response.status(200).json({ result: "CartAdded" });
-  });
+  } catch (error) {
+    console.log("createCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const updateCurrentCart = (request, response) => {
+const updateCurrentCart = async (request, response, next) => {
   const client_id = request.params.client_id;
   const client_name = request.body.client_name;
   const address = request.body.address;
@@ -59,16 +66,20 @@ const updateCurrentCart = (request, response) => {
       SELECT * 
       FROM cart 
       WHERE client_id = $5) AS X)`;
-  db.query(
-    queryText,
-    [client_name, address, phone, checkout_date, client_id],
-    (error, results) => {
-      if (error) {
-        return console.error(error.message);
-      }
-      response.status(200).json({ result: "CurrentCartUpdated" });
-    }
-  );
+  try {
+    const result = await db.query(queryText, [
+      client_name,
+      address,
+      phone,
+      checkout_date,
+      client_id
+    ]);
+    response.status(200).json({ result: "CurrentCartUpdated" });
+  } catch (error) {
+    console.log("updateCurrentCart error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
 module.exports = {

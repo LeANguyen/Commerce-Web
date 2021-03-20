@@ -1,64 +1,60 @@
 const db = require("../db");
+const hashPassword = require("../helpers/hashPassword");
+const checkPassword = require("../helpers/checkPassword");
+const generateToken = require("../helpers/generateToken");
 
-// crypt
-const bcrypt = require("bcrypt");
-const saltRounds = 10;
-
-// Client
-const createClient = (request, response) => {
+const register = async (request, response, next) => {
   const email = request.body.email;
   const pass = request.body.pass;
   const name = request.body.name;
-  const queryText = `INSERT INTO client (name, email, pass) VALUES ($1, $2, $3)`;
-  bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(pass, salt, function(err, hash) {
-      // store hashed password in DB
-      db.query(queryText, [name, email, hash], (error, results) => {
-        if (error) {
-          return console.error(error.message);
-        }
-      });
-      response.status(200).json({ result: "ClientAdded" });
+  const queryText = `INSERT INTO client (name, email, pass, role) VALUES ($1, $2, $3, 'user')`;
+  const hashedPassword = hashPassword(pass);
+  try {
+    const result = await db.query(queryText, [name, email, hashedPassword]);
+    response.status(200).json({
+      status: 200,
+      success: true,
+      message: "User created successfull"
     });
-  });
+  } catch (error) {
+    console.log("register error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
-const getClientByEmail = (request, response) => {
-  const email = request.params.email;
-  const queryText = `SELECT (email, id) FROM client WHERE email = $1`;
-  db.query(queryText, [email], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    response.status(200).json(results.rows);
-  });
-};
-
-const getClientByEmailAndPass = (request, response) => {
+const login = async (request, response, next) => {
   const email = request.body.email;
   const pass = request.body.pass;
   const queryText = `SELECT * FROM client WHERE email = $1`;
-  db.query(queryText, [email], (error, results) => {
-    if (error) {
-      return console.error(error.message);
-    }
-    // valid username but let's see if the password is correct
-    if (results.rowCount != 0) {
-      bcrypt.compare(pass, results.rows[0].pass, function(err, result) {
-        if (result == true) {
-          response.status(200).json(results.rows);
-        } else {
-          response.status(200).json([]);
-        }
-      });
+
+  try {
+    const result = await db.query(queryText, [email]);
+
+    if (result.rowCount != 0) {
+      const validPassword = checkPassword(pass, result.rows[0].pass);
+      if (validPassword) {
+        const token = generateToken({
+          id: result.rows[0].id,
+          name: result.rows[0].name,
+          email: result.rows[0].email,
+          role: result.rows[0].role
+        });
+        response.status(200).json(token);
+      } else {
+        response.status(200).json([]);
+      }
     } else {
       response.status(200).json([]);
     }
-  });
+  } catch (error) {
+    console.log("login error");
+    console.log(error.message);
+    next(error);
+  }
 };
 
 module.exports = {
-  createClient,
-  getClientByEmail,
-  getClientByEmailAndPass
+  register,
+  login
 };

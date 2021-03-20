@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const s3 = require("../aws/s3");
 
-const postImage = (req, res) => {
+const postImage = async (req, res, next) => {
   const fileName = req.files.image_file.name;
   const filePath = path.join(
     __dirname,
@@ -12,15 +12,27 @@ const postImage = (req, res) => {
     "uploaded_images",
     fileName
   );
-  req.files.image_file.mv(filePath, error => {
-    if (error) {
-      throw error;
-    }
-    res.status(200).json({ results: "ImageUploaded" });
-  });
+
+  // async await syntax
+  try {
+    await req.files.image_file.mv(filePath);
+    res.status(200).json({ result: "ImageUploaded" });
+  } catch (error) {
+    console.log("postImage error");
+    console.log(error.message);
+    next(error);
+  }
+
+  // promise syntax
+  // req.files.image_file.mv(filePath, error => {
+  //   if (error) {
+  //     throw error;
+  //   }
+  //   res.status(200).json({ result: "ImageUploaded" });
+  // });
 };
 
-const deleteImage = (req, res) => {
+const deleteImage = (req, res, next) => {
   const filePath = path.join(
     __dirname,
     "..",
@@ -28,13 +40,25 @@ const deleteImage = (req, res) => {
     "uploaded_images",
     "item" + req.query.id + ".png"
   );
-  fs.unlink(filePath, err => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    res.status(200).json({ results: "ImageDeleted" });
-  });
+
+  // async await syntax
+  try {
+    fs.unlinkSync(filePath);
+    res.status(200).json({ result: "ImageDeleted" });
+  } catch (error) {
+    console.log("deleteImage error");
+    console.log(error.message);
+    next(error);
+  }
+
+  // promise syntax
+  // fs.unlink(filePath, err => {
+  //   if (err) {
+  //     console.log(err);
+  //     return;
+  //   }
+  //   res.status(200).json({ result: "ImageDeleted" });
+  // });
 };
 
 const postImageS3 = (req, res) => {
@@ -52,7 +76,7 @@ const postImageS3 = (req, res) => {
 
   // Uploading files to the bucket
   s3.upload(params, function(err, data) {
-    if (err) return console.error(err);
+    if (err) return console.log(err);
     console.log(`File uploaded successfully. ${data.Location}`);
   });
 };
@@ -71,7 +95,7 @@ const getImageS3 = () => {
 
   // Uploading files to the bucket
   s3.getObject(params, (err, data) => {
-    if (err) return console.error(err);
+    if (err) return console.log(err);
     fs.writeFileSync(filePath, data.Body.toString());
     console.log(`${filePath} has been created!`);
   });

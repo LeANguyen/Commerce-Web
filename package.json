@@ -7,7 +7,8 @@
   "main": "app.js",
   "scripts": {
     "bcrypt": "npm install bcrypt",
-    "start": "npm link morgan && npm link winston && nodemon app.js",
+    "start": "npm link morgan && npm link winston && node app.js",
+    "start:dev": "nodemon app.js",
     "prod": "npm run build && npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

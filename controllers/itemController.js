@@ -9,7 +9,7 @@ const createItem = async (request, response, next) => {
   const queryText = `INSERT INTO item (item_name, category, origin, price, description) VALUES ($1, $2, $3, $4, $5)`;
 
   try {
-    const result = await db.query(queryText, [
+    await db.query(queryText, [
       item_name,
       category,
       origin,
@@ -24,57 +24,29 @@ const createItem = async (request, response, next) => {
   }
 };
 
-const getAllItem = async (request, response, next) => {
-  const queryText = `SELECT * FROM item ORDER BY id ASC;`;
+const getItems = async (request, response, next) => {
+  const limit = request.params.limit;
+  const skip = request.params.skip;
+
+  const queryText = `SELECT * FROM item ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
   try {
     const result = await db.query(queryText);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getAllItem error");
-    console.log(error.message);
-    next(error);
-  }
-  // db.query(queryText, (error, results) => {
-  //   if (error) {
-  //     return console.log(error.message);
-  //   }
-  //   response.status(200).json(results.rows);
-  // });
-};
-
-const getAllStartingItem = async (request, response, next) => {
-  const queryText = `SELECT * FROM item ORDER BY id DESC LIMIT 3;`;
-  try {
-    const result = await db.query(queryText);
-    response.status(200).json(result.rows);
-  } catch (error) {
-    console.log("getStartItem error");
+    console.log("getItems error");
     console.log(error.message);
     next(error);
   }
 };
 
-const getMoreItem = async (request, response, next) => {
-  const id = request.params.id;
-  const queryText = `SELECT * FROM item WHERE id < $1 ORDER BY id DESC LIMIT 3;`;
-  try {
-    const result = await db.query(queryText, [id]);
-    response.status(200).json(result.rows);
-  } catch (error) {
-    console.log("getMoreItem error");
-    console.log(error.message);
-    next(error);
-  }
-};
-
-const getAllItemByCategory = async (request, response, next) => {
+const getItemsByCategory = async (request, response, next) => {
   const category = request.params.category;
-  const queryText = `SELECT * FROM item WHERE category = $1 ORDER BY id ASC`;
+  const queryText = `SELECT * FROM item WHERE category = '${category}' ORDER BY id ASC`;
   try {
-    const result = await db.query(queryText, [category]);
+    const result = await db.query(queryText);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getAllItemByCategory error");
+    console.log("getItemsByCategory error");
     console.log(error.message);
     next(error);
   }
@@ -84,7 +56,7 @@ const deleteItem = async (request, response, next) => {
   const id = request.params.id;
   const queryText = `DELETE FROM item WHERE id = $1`;
   try {
-    const result = await db.query(queryText, [id]);
+    await db.query(queryText, [id]);
     response.status(200).json({ result: "ItemDeleted" });
   } catch (error) {
     console.log("deleteItem error");
@@ -93,13 +65,13 @@ const deleteItem = async (request, response, next) => {
   }
 };
 
-const getCurrentItem = async (request, response, next) => {
+const getLatestItem = async (request, response, next) => {
   const queryText = `SELECT MAX(id) FROM (SELECT * FROM item) AS pg_sucks`;
   try {
     const result = await db.query(queryText);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getCurrentItem error");
+    console.log("getLatestItem error");
     console.log(error.message);
     next(error);
   }
@@ -107,9 +79,9 @@ const getCurrentItem = async (request, response, next) => {
 
 const getItemById = async (request, response, next) => {
   const id = request.params.id;
-  const queryText = `SELECT * FROM item WHERE id=$1`;
+  const queryText = `SELECT * FROM item WHERE id=${id}`;
   try {
-    const result = await db.query(queryText, [id]);
+    const result = await db.query(queryText);
     response.status(200).json(result.rows);
   } catch (error) {
     console.log("getItemById error");
@@ -118,15 +90,14 @@ const getItemById = async (request, response, next) => {
   }
 };
 
-const getAllItemByName = async (request, response, next) => {
+const getItemsByName = async (request, response, next) => {
   const name = request.params.name;
+  const queryText = `SELECT * FROM item WHERE UPPER(item_name) LIKE UPPER('%${name}%')`;
   try {
-    const result = await db.query(
-      "SELECT * FROM item WHERE UPPER(item_name) LIKE UPPER('%" + name + "%')"
-    );
+    const result = await db.query(queryText);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getAllItemByName error");
+    console.log("getItemsByName error");
     console.log(error.message);
     next(error);
   }
@@ -141,17 +112,10 @@ const updateItem = async (request, response, next) => {
   const description = request.body.description;
   const queryText = `
   UPDATE item 
-  SET item_name = $1, category = $2, origin = $3, price = $4, description = $5 
-  WHERE id = $6`;
+  SET item_name = '${item_name}', category = '${category}', origin = '${origin}', price = '${price}', description = '${description}' 
+  WHERE id = ${id}`;
   try {
-    const result = await db.query(queryText, [
-      item_name,
-      category,
-      origin,
-      price,
-      description,
-      id
-    ]);
+    await db.query(queryText);
     response.status(200).json({ result: "ItemUpdated" });
   } catch (error) {
     console.log("updateItem error");
@@ -162,13 +126,11 @@ const updateItem = async (request, response, next) => {
 
 module.exports = {
   createItem,
-  getAllItem,
-  getAllStartingItem,
-  getMoreItem,
-  getAllItemByCategory,
-  getCurrentItem,
+  getItems,
+  getItemsByCategory,
+  getLatestItem,
   getItemById,
-  getAllItemByName,
+  getItemsByName,
   updateItem,
   deleteItem
 };

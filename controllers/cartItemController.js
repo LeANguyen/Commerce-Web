@@ -13,7 +13,7 @@ const addItemIntoCurrentCart = async (request, response, next) => {
     WHERE client_id=$2 ORDER BY id DESC LIMIT 1), $3)`;
 
   try {
-    const result = await db.query(queryText, [item_id, client_id, quantity]);
+    await db.query(queryText, [item_id, client_id, quantity]);
     response.status(200).json({ result: "ItemAddedToCurrentCart" });
   } catch (error) {
     console.log("addItemIntoCurrentCart error");
@@ -35,7 +35,7 @@ const getAllItemByCartId = async (request, response, next) => {
     const result = await db.query(queryText, [cart_id]);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getAllItemByCartId error");
+    console.log("getItemsByCartId error");
     console.log(error.message);
     next(error);
   }
@@ -78,7 +78,7 @@ const getAllItemFromCurrentCart = async (request, response, next) => {
     const result = await db.query(queryText, [client_id]);
     response.status(200).json(result.rows);
   } catch (error) {
-    console.log("getAllItemFromCurrentCart error");
+    console.log("getItemsFromCurrentCart error");
     console.log(error.message);
     next(error);
   }

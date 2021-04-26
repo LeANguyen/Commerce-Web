@@ -114,7 +114,7 @@
       "name": document.getElementById("name_input_signup").value,
     }
 
-    fetch(myURL + '/signup', {
+    fetch(myURL + '/register', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -137,7 +137,7 @@
       "pass": password
     }
 
-    fetch(myURL + '/signin', {
+    fetch(myURL + '/login', {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -6,7 +6,6 @@ require("dotenv").config();
  * @param {int} data
  * @returns {string} token
  */
-const test = "TEST";
 const generateToken = data => {
   const token = jwt.sign(data, process.env.TOKEN_SECRET);
   return token;

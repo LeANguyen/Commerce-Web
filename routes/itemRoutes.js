@@ -1,48 +1,105 @@
 const express = require("express");
-const itemController = require("../controllers/itemController");
 const router = express.Router();
-
-// middleware
-const verifyToken = require("../middlewares/verifyToken");
-const role = require("../middlewares/role");
-
-// router.post(
-//   "/item",
-//   (res, req, next) => verifyToken(res, req, next, role.admin),
-//   itemController.createItem
-// );
-// router.delete(
-//   "/item/id/:id",
-//   (res, req, next) => verifyToken(res, req, next, role.admin),
-//   itemController.deleteItem
-// );
-// router.put(
-//   "/item/id/:id",
-//   (res, req, next) => verifyToken(res, req, next, role.admin),
-//   itemController.updateItem
-// );
-
-// router.get("/items", verifyToken, itemController.getAllItem);
-// router.get("/items/starting", verifyToken, itemController.getAllStartingItem);
-// router.get("/items/more/id/:id", verifyToken, itemController.getMoreItem);
-// router.get(
-//   "/items/category/:category",
-//   verifyToken,
-//   itemController.getAllItemByCategory
-// );
-// router.get("/items/name/:name", verifyToken, itemController.getAllItemByName);
-// router.get("/item/id/:id", verifyToken, itemController.getItemById);
-// router.get("/current_item", verifyToken, itemController.getCurrentItem);
+const itemController = require("../controllers/itemController");
 
 router.post("/item", itemController.createItem);
 router.delete("/item/id/:id", itemController.deleteItem);
 router.put("/item/id/:id", itemController.updateItem);
 
-router.get("/items", itemController.getAllItem);
-router.get("/items/starting", itemController.getAllStartingItem);
-router.get("/items/more/id/:id", itemController.getMoreItem);
-router.get("/items/category/:category", itemController.getAllItemByCategory);
-router.get("/items/name/:name", itemController.getAllItemByName);
+/**
+ * @swagger
+ * tags:
+ *     name: Item
+ *     description: open API to get item(s) info for visitor
+ */
+
+/**
+ * @swagger
+ * /items/skip/{skip}/limit/{limit}:
+ *   get:
+ *     description: Get items
+ *     tags: [Item]
+ *     parameters:
+ *      - name: skip
+ *        in: path
+ *        required: true
+ *        type: string
+ *      - name: limit
+ *        in: path
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
+router.get("/items/skip/:skip/limit/:limit", itemController.getItems);
+
+/**
+ * @swagger
+ * /items/category/{category}:
+ *   get:
+ *     description: Get items by category
+ *     tags: [Item]
+ *     parameters:
+ *      - name: category
+ *        in: path
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
+router.get("/items/category/:category", itemController.getItemsByCategory);
+
+/**
+ * @swagger
+ * /items/name/{name}:
+ *   get:
+ *     description: Get items by name
+ *     tags: [Item]
+ *     parameters:
+ *      - name: name
+ *        in: path
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
+router.get("/items/name/:name", itemController.getItemsByName);
+
+/**
+ * @swagger
+ * /item/id/{id}:
+ *   get:
+ *     description: Get item by id
+ *     tags: [Item]
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
 router.get("/item/id/:id", itemController.getItemById);
-router.get("/current_item", itemController.getCurrentItem);
+
+/**
+ * @swagger
+ * /latest_item:
+ *   get:
+ *     description: Get the latest item
+ *     tags: [Item]
+ *     responses:
+ *       200:
+ *         description: Success
+ *
+ */
+router.get("/latest_item", itemController.getLatestItem);
+
 module.exports = router;

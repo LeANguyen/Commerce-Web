@@ -1,4 +1,4 @@
-function handleError(error, request, response, next) {
+const handleError = (error, request, response, next) => {
   // custom application error
   if (typeof error === "string") {
     return response
@@ -26,6 +26,6 @@ function handleError(error, request, response, next) {
   return response
     .status(500)
     .json({ status: 500, success: false, message: error.message });
-}
+};
 
 module.exports = handleError;

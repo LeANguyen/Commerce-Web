@@ -9,30 +9,26 @@ const s3 = new AWS.S3({
   region: "us-west-2"
 });
 
-// routes
-const userRoutes = require("./routes/userRoutes");
-const itemRoutes = require("./routes/itemRoutes");
-const cartItemRoutes = require("./routes/cartItemRoutes");
-const cartRoutes = require("./routes/cartRoutes");
-const imageRoutes = require("./routes/imageRoutes");
-const viewRoutes = require("./routes/viewRoutes");
-
-// middlewares
+const routes = require("./routes");
 
 // API
 const express = require("express");
 const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
+const swaggerUi = require("swagger-ui-express");
+
+// middlewares
+const httpLogger = require("./middlewares/httpLogger");
+const logger = require("./utils/logger");
+const swagger = require("./utils/swagger");
 
 // CORS
 const cors = require("cors");
-const basicAuth = require("express-basic-auth");
 
 // config app
 const app = express();
 app.use(cors());
 app.options("*", cors());
-
 app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(
@@ -42,30 +38,27 @@ app.use(
 );
 app.use(fileupload());
 app.set("view engine", "ejs");
+app.use(httpLogger);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swagger));
 
 // view
-app.use("", viewRoutes);
-
-// app.use(
-//   basicAuth({
-//     users: { admin: "supersecret" }
-//   })
-// );
+app.use("", routes.viewRoutes);
 
 // client
-app.use("", userRoutes);
+app.use("", routes.userRoutes);
 
 // item
-app.use("", itemRoutes);
+app.use("", routes.itemRoutes);
 
 // cart
-app.use("", cartRoutes);
+app.use("", routes.cartRoutes);
 
 // cart_item
-app.use("", cartItemRoutes);
+app.use("", routes.cartItemRoutes);
 
 // image
-app.use("", imageRoutes);
+app.use("", routes.imageRoutes);
 
 const handleError = require("./middlewares/handleError");
 app.use(handleError);
@@ -151,8 +144,7 @@ app.use(handleError);
 //   else console.log("Bucket Created Successfully", data.Location);
 // });
 
-// process.env
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`App running on port ${port}.`);
+  logger.info(`Server listening on port ${port}`);
 });

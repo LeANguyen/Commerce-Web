@@ -4,10 +4,10 @@ require("dotenv").config();
 
 const verifyToken = async (req, res, next, roles = []) => {
   const { token: headerToken = "" } = req.headers;
-
+  const status = 400;
+  const success = false;
   // check if there is a JWT provided
   if (!headerToken) {
-    status = 400;
     return res
       .status(401)
       .json({ status: 401, success: false, message: "No token provided" });

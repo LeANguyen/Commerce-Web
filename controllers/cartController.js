@@ -42,7 +42,7 @@ const createCart = async (request, response, next) => {
   const client_id = request.params.client_id;
   const queryText = `INSERT INTO cart (client_id) VALUES ($1)`;
   try {
-    const result = await db.query(queryText, [client_id]);
+    await db.query(queryText, [client_id]);
     response.status(200).json({ result: "CartAdded" });
   } catch (error) {
     console.log("createCart error");

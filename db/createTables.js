@@ -17,7 +17,7 @@ const createTables = async () => {
       item_name varchar(255),
       category varchar(255),
       origin varchar(255),
-      price varchar(255),
+      price int,
       description varchar(255),
       PRIMARY KEY(id)
       );`;
@@ -44,7 +44,7 @@ const createTables = async () => {
       );`;
 
   const createAdmin = `
-  INSERT INTO client (name, email, role,pass) 
+  INSERT INTO client (name, email, role, pass) 
   VALUES ('admin', 'admin', 'admin', '$2b$10$2CTYqvpnVMRjK5WY1xu3NO1uI/9cUVuiOpqiTNuw7oPegKBayIQfW');
   INSERT INTO cart (client_id) VALUES (1);`;
 

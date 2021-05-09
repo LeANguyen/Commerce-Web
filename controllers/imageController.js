@@ -5,13 +5,7 @@ const s3 = require("../aws/s3");
 
 const postImage = async (req, res, next) => {
   const fileName = req.files.image_file.name;
-  const filePath = path.join(
-    __dirname,
-    "..",
-    "public",
-    "uploaded_images",
-    fileName
-  );
+  const filePath = path.join(__dirname, "..", "public", "images", fileName);
 
   // async await syntax
   try {
@@ -37,7 +31,7 @@ const deleteImage = (req, res, next) => {
     __dirname,
     "..",
     "public",
-    "uploaded_images",
+    "images",
     "item" + req.query.id + ".png"
   );
 

@@ -1,7 +1,7 @@
 const db = require("../db");
 
 const createItem = async (request, response, next) => {
-  const item_name = request.body.item_name;
+  const itemName = request.body.itemName;
   const category = request.body.category;
   const origin = request.body.origin;
   const price = request.body.price;
@@ -9,13 +9,7 @@ const createItem = async (request, response, next) => {
   const queryText = `INSERT INTO item (item_name, category, origin, price, description) VALUES ($1, $2, $3, $4, $5)`;
 
   try {
-    await db.query(queryText, [
-      item_name,
-      category,
-      origin,
-      price,
-      description
-    ]);
+    await db.query(queryText, [itemName, category, origin, price, description]);
     response.status(200).json({ result: "ItemAdded" });
   } catch (error) {
     console.log("createItem error");
@@ -24,11 +18,35 @@ const createItem = async (request, response, next) => {
   }
 };
 
-const getItems = async (request, response, next) => {
-  const limit = request.params.limit;
-  const skip = request.params.skip;
+const searchItems = async (request, response, next) => {
+  const itemName = request.body.itemName;
+  const category = request.body.category;
+  const origin = request.body.origin;
+  const priceFrom = request.body.priceFrom;
+  const priceTo = request.body.priceTo;
+  const limit = request.query.limit;
+  const skip = request.query.skip;
 
-  const queryText = `SELECT * FROM item ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
+  const queryText1 = `SELECT COUNT(id) FROM item WHERE UPPER(item_name) LIKE UPPER('%${itemName}%') AND category='${category}' AND origin='${origin}' AND price >= ${priceFrom} AND price <= ${priceTo} GROUP BY id ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
+  const queryText2 = `SELECT * FROM item WHERE UPPER(item_name) LIKE UPPER('%${itemName}%') AND category='${category}' AND origin='${origin}' AND price >= ${priceFrom} AND price <= ${priceTo} ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
+  const queryText = `SELECT (${queryText1}) AS count, (SELECT coalesce(json_agg(t.*), '[]'::json) FROM (${queryText2}) AS t) AS rows`;
+  try {
+    const result = await db.query(queryText2);
+    response.status(200).json(result.rows);
+  } catch (error) {
+    console.log("searchItems error");
+    console.log(error.message);
+    next(error);
+  }
+};
+
+const getItems = async (request, response, next) => {
+  const limit = request.query.limit ? request.query.limit : 5;
+  const skip = request.query.skip ? request.query.skip : 0;
+
+  const queryText1 = `SELECT COUNT(*) FROM item`;
+  const queryText2 = `SELECT * FROM item ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
+  const queryText = `SELECT (${queryText1}) AS count, (SELECT coalesce(json_agg(t.*), '[]'::json) FROM (${queryText2}) AS t) AS rows`;
   try {
     const result = await db.query(queryText);
     response.status(200).json(result.rows);
@@ -110,6 +128,7 @@ const updateItem = async (request, response, next) => {
   const origin = request.body.origin;
   const price = request.body.price;
   const description = request.body.description;
+
   const queryText = `
   UPDATE item 
   SET item_name = '${item_name}', category = '${category}', origin = '${origin}', price = '${price}', description = '${description}' 
@@ -132,5 +151,6 @@ module.exports = {
   getItemById,
   getItemsByName,
   updateItem,
-  deleteItem
+  deleteItem,
+  searchItems
 };

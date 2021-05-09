@@ -33,7 +33,7 @@ router.put("/item/id/:id", itemController.updateItem);
  *         description: Success
  *
  */
-router.get("/items/skip/:skip/limit/:limit", itemController.getItems);
+router.get("/items", itemController.getItems);
 
 /**
  * @swagger
@@ -101,5 +101,5 @@ router.get("/item/id/:id", itemController.getItemById);
  *
  */
 router.get("/latest_item", itemController.getLatestItem);
-
+router.post("/items/search", itemController.searchItems);
 module.exports = router;

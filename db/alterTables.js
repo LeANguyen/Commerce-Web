@@ -11,14 +11,6 @@ const alterTables = async () => {
     console.error(error.message);
   }
   db.end();
-  // .then(res => {
-  //   console.log(res);
-  //   db.end();
-  // })
-  // .catch(err => {
-  //   console.log(err);
-  //   db.end();
-  // });
 };
 
 module.exports = alterTables;

@@ -3,8 +3,8 @@ content-type: application/json
 
 {
     "itemName": "Shoe",
-    "category": "Shoe",
-    "origin": "China",
-    "priceFrom": 1,
-    "priceTo": 1000
+    "category": "Any",
+    "origin": "USA",
+    "priceFrom": "",
+    "priceTo": ""
 }

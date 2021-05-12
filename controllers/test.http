@@ -2,9 +2,9 @@ POST http://localhost:3000/items/search?skip=0&limit=9
 content-type: application/json
 
 {
-    "itemName": "Shoe",
+    "itemName": "item",
     "category": "Any",
-    "origin": "USA",
-    "priceFrom": "",
-    "priceTo": ""
+    "origin": "Any",
+    "priceFrom": 200,
+    "priceTo": 300
 }

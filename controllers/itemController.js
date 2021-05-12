@@ -39,17 +39,17 @@ const searchItems = async (request, response, next) => {
 
   const queryText1 = `SELECT COUNT(*) FROM item 
   WHERE UPPER(item_name) LIKE UPPER('%${itemName}%') 
-  AND category=${category} 
-  AND origin=${origin} 
-  AND price >= ${priceFrom} 
-  AND price <= ${priceTo}`;
+  OR category=${category} 
+  OR origin=${origin} 
+  OR price >= ${priceFrom} 
+  OR price <= ${priceTo}`;
 
   const queryText2 = `SELECT * FROM item 
   WHERE UPPER(item_name) LIKE UPPER('%${itemName}%') 
-  AND category=${category} 
-  AND origin=${origin}
-  AND price >= ${priceFrom} 
-  AND price <= ${priceTo} ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
+  OR category=${category} 
+  OR origin=${origin}
+  OR price >= ${priceFrom} 
+  OR price <= ${priceTo} ORDER BY id DESC LIMIT ${limit} OFFSET ${skip}`;
 
   const queryText = `SELECT (${queryText1}) AS count, (SELECT coalesce(json_agg(t.*), '[]'::json) FROM (${queryText2}) AS t) AS rows`;
 
